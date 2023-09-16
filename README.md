@@ -1,6 +1,6 @@
 <br>
 <p align="center">
-  <img src="icon.png" alt="Icon" width="700" style="max-width: 100%;">
+  <img src="icon.png" alt="Icon" width="600" style="max-width: 100%;">
 </p>
 
 This repo provides an AI agent for intelligent interaction with the 

@@ -1,3 +1,7 @@
-from .mxnet import MXNETTutorial
+from .mxnet import (
+    MXNETTutorial,
+)
 
-tutorials = [MXNETTutorial]
+tutorials = (
+    MXNETTutorial,
+)

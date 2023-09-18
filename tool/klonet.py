@@ -1,5 +1,9 @@
-import random
 from transformers import Tool
+from controller import KlonetController
+
+PROJECT_NAME = "klonetai"
+USER_NAME = "wudx"
+controller = KlonetController(PROJECT_NAME, USER_NAME)
 
 
 class KlonetGetAllImagesTool(Tool):
@@ -21,8 +25,28 @@ class KlonetGetAllImagesTool(Tool):
     ''')
 
     def __call__(self):
-        print("Calling Klonet Get All Images API ...")
-        print("{'ubuntu': <ImageObject1>, 'ovs': <ImageObject2>, ...}")
+        return controller.images().keys()
+
+
+class KlonetViewTopoTool(Tool):
+    name = "klonet_view_topo"
+    description = ('''
+    Overview the current network topology on Klonet.
+    
+    Example:
+        >>> klonet_view_topo()
+    ''')
+
+    def __call__(self):
+        topo = controller.topo
+        node_info = {
+            name: obj.image_name
+            for name, obj in topo.get_nodes().items()}
+        link_info = {
+            name: (obj.source, obj.target)
+            for name, obj in topo.get_links().items()}
+        msg = f"Nodes: {node_info}\nLinks: {link_info}"
+        return msg
 
 
 class KlonetAddNodeTool(Tool):
@@ -54,9 +78,9 @@ class KlonetAddNodeTool(Tool):
 
     def __call__(self, name: str = "", image: str = "ubuntu", 
                  cpu_limit: int = None, mem_limit: int = None):
-        print("Calling Klonet Add Node API ...")
-        print(f"A new node (name: {name}, image: {image}, cpu_limit: {cpu_limit}, "
-              f"mem_limit: {mem_limit}) have been added to the network.")
+        node = controller.add_node(name, controller.images[image], cpu_limit, mem_limit)
+        print(f"A new node (name: {node.name}, image: {node.image_name}, "
+              f"resource limit: {node.resource_limit}) have been added to the network.")
 
 
 class KlonetDeleteNodeTool(Tool):
@@ -106,9 +130,11 @@ class KlonetAddLinkTool(Tool):
 
     def __call__(self, src_node: str, dst_node: str, link_name: str = None,
                  src_ip: str = "", dst_ip: str = ""):
-        print("Calling Klonet Add Link API ...")
-        print(f"A link with name ({link_name}) was added between nodes {src_node} "
-              f"(ip: {src_ip}) and {dst_node} (ip: {dst_ip})")
+        src_node = controller.nodes[src_node]
+        dst_node = controller.nodes[dst_node]
+        link = controller.add_link(src_node, dst_node, link_name, src_ip, dst_ip)
+        print(f"A link with name ({link.name}) was added between nodes {link.source} "
+              f"(ip: {link.sourceIP}) and {link.target} (ip: {link.targetIP})")
 
 
 class KlonetDeployTool(Tool):
@@ -116,31 +142,21 @@ class KlonetDeployTool(Tool):
     description = ('''
     Deploy the designed network to Klonet.
     
-    Args:
-        project_name (str, optional): The name of the project to deploy 
-            (default is an empty string).
+    Inputs:
+        None
 
     Returns:
         None
         
     Example:
-        >>> klonet_deploy_network("my_topo")  # Replace the project name as you wish.
+        >>> klonet_deploy_network()
     ''')
 
     inputs = ["str"]
 
-    def __call__(self, project_name: str = ""):
-        name_generator = lambda: f'''{random.choice([
-            'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Helen', 'Ivy', 
-            'Jack', 'Kate', 'Liam', 'Mia', 'Noah', 'Olivia', 'Peter', 'Quinn', 
-            'Ryan', 'Sophia', 'Tom', 'Uma', 'Victor', 'Willow', 'Xander', 'Yara', 'Zoe'
-        ])}_{random.choice([
-            'Smith', 'Johnson', 'Brown', 'Taylor', 'Miller', 'Wilson', 'Moore', 'Anderson', 
-            'Jackson', 'Harris', 'Martin', 'Lee', 'Walker', 'Hall', 'Lewis', 'Clark', 
-            'Young', 'Wright'])}'''
-        project_name = project_name or name_generator()
-        print("Calling Klonet Deploy Network API ...")
-        print(f"Deploy project {project_name} success.")
+    def __call__(self):
+        controller.deploy()
+        print(f"Deploy project {PROJECT_NAME} success.")
 
 
 class KlonetCommandExecTool(Tool):

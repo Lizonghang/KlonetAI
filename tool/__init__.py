@@ -9,6 +9,7 @@ from .klonet import (
     KlonetDeleteNodeTool,
     KlonetDeployTool,
     KlonetGetAllImagesTool,
+    KlonetViewTopoTool,
 )
 from .gpt import SummarizeTool
 
@@ -21,6 +22,7 @@ free_tools = (
     KlonetDeleteNodeTool,
     KlonetDeployTool,
     KlonetGetAllImagesTool,
+    KlonetViewTopoTool,
 )
 
 gpt_tools = (

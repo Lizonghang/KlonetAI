@@ -37,16 +37,19 @@ class KlonetController:
         self._topo = Topo()
         self._project_manager.destroy(self._project)
 
-    def add_node(self, name, image, cpu_limit=None, mem_limit=None):
-        resource_limit = {"cpu": cpu_limit, "mem": mem_limit}
+    def add_node(self, name, image, cpu_limit=None, mem_limit=None, x=0, y=0):
         node = self._topo.add_node(
-            image, name, resource_limit)
+            image, name,
+            resource_limit={"cpu": cpu_limit, "mem": mem_limit},
+            location={"x": x, "y": y})
         return node
 
-    def add_node_runtime(self, name, image, cpu_limit=None, mem_limit=None):
-        resource_limit = {"cpu": cpu_limit, "mem": mem_limit}
+    def add_node_runtime(self, name, image, cpu_limit=None, mem_limit=None, x=0, y=0):
         node = self._node_manager.dynamic_add_node(
-            name, image, resource_limit)
+            name, image,
+            resource_limit={"cpu": cpu_limit, "mem": mem_limit},
+            location={"x": x, "y": y}
+        )
         return node
 
     def delete_node_runtime(self, name):

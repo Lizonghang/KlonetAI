@@ -43,4 +43,6 @@ class SummarizeTool(Tool):
                 )
             }]
         )
-        return response['choices'][0]['message']['content']
+        content = response['choices'][0]['message']['content']
+        context = content.replace('```', '\n')
+        return context

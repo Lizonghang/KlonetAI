@@ -89,7 +89,7 @@ Deploy project klonetai success.
 ```
 
 <p align="center">
-  <img src="images/klonet-star-topo.png" alt="Klonet Screenshot" width="700">
+  <img src="images/klonet-star-topo.png" alt="Klonet Screenshot">
 </p>
 
 ### Case 2: Create a Star Topology and Launch MXNET Distributed Training

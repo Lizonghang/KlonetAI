@@ -1,0 +1,49 @@
+from klonet_api import *
+
+
+class KlonetController:
+
+    def __init__(self, project, user):
+        self._backend_host = "kb310server.f3322.net"
+        self._port = 12313
+        self._project = project
+        self._user = user
+
+        self._image_manager = ImageManager(user, self._backend_host, self._port)
+        self._images = self._image_manager.get_images()
+        self._project_manager = ProjectManager(user, self._backend_host, self._port)
+        self._node_manager = NodeManager(user, project, self._backend_host, self._port)
+        self._link_manager = LinkManager(user, project, self._backend_host, self._port)
+        self._cmd_manager = CmdManager(user, project, self._backend_host, self._port)
+        self._topo = Topo()
+
+    @property
+    def images(self):
+        return self._images
+
+    @property
+    def topo(self):
+        return self._topo
+
+    @property
+    def nodes(self):
+        return self._topo.get_nodes()
+
+    @property
+    def links(self):
+        return self._topo.get_links()
+
+    def reset_topo(self):
+        self._topo = Topo()
+
+    def add_node(self, name, image, cpu_limit=None, mem_limit=None):
+        resource_limit = {"cpu": cpu_limit, "mem": mem_limit}
+        node = self._topo.add_node(image, name, resource_limit)
+        return node
+
+    def add_link(self, src_node, dst_node, link_name=None, src_ip="", dst_ip=""):
+        link = self._topo.add_link(src_node, dst_node, link_name, src_ip, dst_ip)
+        return link
+
+    def deploy(self):
+        self._project_manager.deploy(self._project, self._topo)

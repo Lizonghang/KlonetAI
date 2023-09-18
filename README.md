@@ -12,18 +12,19 @@ import tool
 import tutorial
 import inspect
 from transformers.tools import OpenAiAgent
+from key import OpenAI_API_Key
 
 # Collect our KlonetAI tools.
 klonetai_tools = [obj() for obj in tool.free_tools] 
 klonetai_tools += [obj() for obj in tool.gpt_tools]  # note: these are not free.
 klonetai_tools += [obj() for obj in tutorial.tutorials]
 
-# Replace <OpenAI-API-Key> with your actual OpenAI API key.
-api_key = "<Your-OpenAI-API-Key>"
-
 # Instantiate the Agent with our KlonetAI tools.
 agent = OpenAiAgent(
-    model="gpt-3.5-turbo", api_key, additional_tools=custom_tools)
+    model="gpt-3.5-turbo", 
+    api_key=OpenAI_API_Key, 
+    additional_tools=custom_tools
+)
 
 # Replace the default summarizer with our GPT summarizer.
 agent.toolbox["summarizer"] = tool.SummarizeTool()

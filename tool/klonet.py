@@ -309,3 +309,25 @@ class KlonetCommandExecTool(Tool):
     def __call__(self, node_name: str, command: str):
         response = controller.execute(node_name, command)
         return response[node_name][command]['output'].strip()
+
+
+class KlonetSSHServiceTool(Tool):
+    name = "klonet_enable_ssh_service"
+    description = ('''
+    Enable SSH service on a specified Klonet node.
+    
+    Args:
+        node_name (str): The name of the node on which SSH service should be enabled.
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_enable_ssh_service('h1')
+    ''')
+
+    inputs = ["str"]
+
+    def __call__(self, node_name: str):
+        started = controller.enable_ssh_service(node_name)
+        print(f"SSH service on {node_name} started {'success' if started else 'failed'}.")

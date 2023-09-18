@@ -75,3 +75,6 @@ class KlonetController:
             node_name: [command]
         })
         return response
+
+    def enable_ssh_service(self, node_name):
+        return self._node_manager.ssh_service(node_name, True)

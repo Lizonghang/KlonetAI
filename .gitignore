@@ -159,7 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-vemu_api/
+klonet_api/
+klonet_webui/
 demo.py
 *.ipynb
 key.py

@@ -241,7 +241,7 @@ Note: Manually launching jobs on the same machine is not recommended for distrib
 ```
 
 ```python
-agent.run(f'''
+>>> agent.run(f'''
 The tutorials are here: {doc}
 
 Create a star network with 6 host nodes and 1 ovs node, 

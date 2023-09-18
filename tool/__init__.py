@@ -1,8 +1,28 @@
-from .common import GetCurrentDateTimeTool
-from .common import GetCurrentDayTool
-from .klonet import KlonetAddLinkTool
-from .klonet import KlonetAddNodeTool
-from .klonet import KlonetCommandExecTool
-from .klonet import KlonetDeleteNodeTool
-from .klonet import KlonetDeployTool
-from .klonet import KlonetGetAllImagesTool
+from .common import (
+    GetCurrentDateTimeTool,
+    GetCurrentDayTool
+)
+from .klonet import (
+    KlonetAddLinkTool,
+    KlonetAddNodeTool,
+    KlonetCommandExecTool,
+    KlonetDeleteNodeTool,
+    KlonetDeployTool,
+    KlonetGetAllImagesTool,
+)
+from .gpt import SummarizeTool
+
+free_tools = (
+    GetCurrentDateTimeTool,
+    GetCurrentDayTool,
+    KlonetAddLinkTool,
+    KlonetAddNodeTool,
+    KlonetCommandExecTool,
+    KlonetDeleteNodeTool,
+    KlonetDeployTool,
+    KlonetGetAllImagesTool,
+)
+
+gpt_tools = (
+    SummarizeTool,
+)

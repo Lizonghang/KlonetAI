@@ -69,3 +69,9 @@ class KlonetController:
 
     def deploy(self):
         self._project_manager.deploy(self._project, self._topo)
+
+    def execute(self, node_name, command):
+        response = self._cmd_manager.exec_cmds_in_nodes({
+            node_name: [command]
+        })
+        return response

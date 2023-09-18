@@ -296,25 +296,16 @@ class KlonetCommandExecTool(Tool):
             commands can be separated by semicolons ';', and they will be executed sequentially.
 
     Returns: 
-        dict: A dictionary describing the results of command execution on nodes. 
-            The keys are node names, and the values are dictionaries containing 
-            the specific command's execution results. For example:
-            {
-                'h1': {
-                    'ls': {
-                        "exit_code": 0,
-                        "output": "bin"
-                    }
-                }
-            }
+        str: The output of command execution on nodes. 
     
     Example:
-        >>> klonet_command_exec("h1", "ls; pwd")
+        >>> output = klonet_command_exec("h1", "ls; pwd")
+        >>> print(output)
     ''')
 
     inputs = ["str", "str"]
+    outputs = ["str"]
 
     def __call__(self, node_name: str, command: str):
-        print("Calling Klonet Exec Command API ...")
-        print(f"Feedback from {node_name} after calling {command}.")
-        return None
+        response = controller.execute(node_name, command)
+        return response[node_name][command]['output'].strip()

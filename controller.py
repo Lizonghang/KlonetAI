@@ -33,17 +33,36 @@ class KlonetController:
     def links(self):
         return self._topo.get_links()
 
-    def reset_topo(self):
+    def reset_project(self):
         self._topo = Topo()
+        self._project_manager.destroy(self._project)
 
     def add_node(self, name, image, cpu_limit=None, mem_limit=None):
         resource_limit = {"cpu": cpu_limit, "mem": mem_limit}
-        node = self._topo.add_node(image, name, resource_limit)
+        node = self._topo.add_node(
+            image, name, resource_limit)
         return node
 
+    def add_node_runtime(self, name, image, cpu_limit=None, mem_limit=None):
+        resource_limit = {"cpu": cpu_limit, "mem": mem_limit}
+        node = self._node_manager.dynamic_add_node(
+            name, image, resource_limit)
+        return node
+
+    def delete_node_runtime(self, name):
+        self._node_manager.dynamic_delete_node(name)
+
     def add_link(self, src_node, dst_node, link_name=None, src_ip="", dst_ip=""):
-        link = self._topo.add_link(src_node, dst_node, link_name, src_ip, dst_ip)
+        link = self._topo.add_link(
+            src_node, dst_node, link_name, src_ip, dst_ip)
         return link
+
+    def add_link_runtime(self, src_node, dst_node, link_name=None, src_ip="", dst_ip=""):
+        self._link_manager.dynamic_add_link(
+            link_name, src_node, dst_node, src_ip, dst_ip)
+
+    def delete_link_runtime(self, link_name):
+        self._link_manager.dynamic_delete_link(link_name)
 
     def deploy(self):
         self._project_manager.deploy(self._project, self._topo)

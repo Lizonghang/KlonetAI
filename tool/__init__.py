@@ -6,10 +6,14 @@ from .klonet import (
     KlonetAddLinkTool,
     KlonetAddNodeTool,
     KlonetCommandExecTool,
-    KlonetDeleteNodeTool,
+    KlonetRuntimeDeleteNodeTool,
     KlonetDeployTool,
     KlonetGetAllImagesTool,
     KlonetViewTopoTool,
+    KlonetDestroyProjectTool,
+    KlonetRuntimeAddNodeTool,
+    KlonetRuntimeAddLinkTool,
+    KlonetRuntimeDeleteLinkTool,
 )
 from .gpt import SummarizeTool
 
@@ -19,10 +23,14 @@ free_tools = (
     KlonetAddLinkTool,
     KlonetAddNodeTool,
     KlonetCommandExecTool,
-    KlonetDeleteNodeTool,
+    KlonetRuntimeDeleteNodeTool,
     KlonetDeployTool,
     KlonetGetAllImagesTool,
     KlonetViewTopoTool,
+    KlonetDestroyProjectTool,
+    KlonetRuntimeAddNodeTool,
+    KlonetRuntimeAddLinkTool,
+    KlonetRuntimeDeleteLinkTool,
 )
 
 gpt_tools = (

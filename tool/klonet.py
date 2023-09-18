@@ -104,6 +104,12 @@ class KlonetRuntimeAddNodeTool(Tool):
             default to None, which will use the default cpu limits from the Docker image.
         mem_limit (int, optional): Memory utilization limit for the node, unit: Mbytes, 
             default to None, which will use the default memory limits from the Docker image.
+        x (int, optional): The x-coordinate of the node on the canvas. The default value is 0.
+            It should be set as an integer value between 0 and 1000. The agent should set this
+            for pretty visual layout.
+        y (int, optional): The y-coordinate of the node on the canvas. The default value is 0.
+            It should be set as an integer value between 0 and 1000. The agent should set this
+            for pretty visual layout.
 
     Raises:
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
@@ -112,12 +118,12 @@ class KlonetRuntimeAddNodeTool(Tool):
         >>> klonet_runtime_add_node("h3", "ubuntu")
     ''')
 
-    inputs = ["str", "str", "int", "int"]
+    inputs = ["str", "str", "int", "int", "int", "int"]
 
-    def __call__(self, name: str = "", image: str = "ubuntu",
-                 cpu_limit: int = None, mem_limit: int = None):
+    def __call__(self, name: str = "", image: str = "ubuntu", cpu_limit: int = None,
+                 mem_limit: int = None, x: int = 0, y: int = 0):
         node = controller.add_node_runtime(
-            name, controller.images[image], cpu_limit, mem_limit)
+            name, controller.images[image], cpu_limit, mem_limit, x, y)
         print(f"A new node (name: {node.name}, image: {node.image_name}, "
               f"resource limit: {node.resource_limit}) have been added to the network.")
 

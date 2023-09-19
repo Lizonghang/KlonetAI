@@ -75,22 +75,25 @@ class KlonetAddNodeTool(Tool):
         mem_limit (int, optional): Memory utilization limit for the node, unit: Mbytes, 
             default to None, which will use the default memory limits from the Docker image.
         x (int, optional): The x-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 1000. The agent should set this
+            It should be set as an integer value between 0 and 700. The agent should set this
             for pretty visual layout.
         y (int, optional): The y-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 1000. The agent should set this
+            It should be set as an integer value between 0 and 700. The agent should set this
             for pretty visual layout.
+    
+    Returns:
+        None
 
     Raises:
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
 
     Example:
         # Add two host nodes (h1, h2) using the klonet_add_node function.
-        >>> h1 = klonet_add_node("h1", "ubuntu", x=500, y=500)
-        >>> h2 = klonet_add_node("h2", "ubuntu", cpu_limit=1000, mem_limit=1000)
+        >>> klonet_add_node("h1", "ubuntu", x=500, y=500)
+        >>> klonet_add_node("h2", "ubuntu", cpu_limit=1000, mem_limit=1000)
 
         # Add an ovs node (s1) using the klonet_add_node function.
-        >>> s1 = klonet_add_node("s1", "ovs")
+        >>> klonet_add_node("s1", "ovs")
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
@@ -119,11 +122,14 @@ class KlonetRuntimeAddNodeTool(Tool):
         mem_limit (int, optional): Memory utilization limit for the node, unit: Mbytes, 
             default to None, which will use the default memory limits from the Docker image.
         x (int, optional): The x-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 1000. The agent should set this
+            It should be set as an integer value between 0 and 700. The agent should set this
             for pretty visual layout.
         y (int, optional): The y-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 1000. The agent should set this
+            It should be set as an integer value between 0 and 700. The agent should set this
             for pretty visual layout.
+
+    Returns:
+        None
 
     Raises:
         NodeDuplicatesError: Raised when the provided node name is a duplicate.

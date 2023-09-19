@@ -1,5 +1,6 @@
 from transformers import Tool
 from controller import KlonetController
+from klonet_api import VemuExecError
 
 PROJECT_NAME = "klonetai"
 USER_NAME = "wudx"
@@ -329,5 +330,34 @@ class KlonetSSHServiceTool(Tool):
     inputs = ["str"]
 
     def __call__(self, node_name: str):
-        started = controller.enable_ssh_service(node_name)
-        print(f"SSH service on {node_name} started {'success' if started else 'failed'}.")
+        success = controller.enable_ssh_service(node_name)
+        print(f"SSH service on {node_name} started {'success' if success else 'failed'}.")
+
+
+class KlonetPortMappingTool(Tool):
+    name = "klonet_port_mapping"
+    description = ('''
+    Perform port mapping for a specified Klonet node.
+    
+    Args:
+        node_name (str): The name of the node on which a port to be mapped.
+        container_port (int): The port number in the container to be mapped.
+        host_port (int): The port number on the host to map to. The host port
+            should be between 9200 and 40000.
+    
+    Returns:
+        None
+    
+    Example:
+        # Map the port 80 of the container to the port 8080 of the host.
+        >>> klonet_port_mapping('h1', 80, 8080)
+    ''')
+
+    inputs = ["str", "int", "int"]
+
+    def __call__(self, node_name: str, container_port: int, host_port: int):
+        try:
+            success = controller.port_mapping(node_name, container_port, host_port)
+            print(f"Port mapping on {node_name} is {'success' if success else 'failed'}")
+        except VemuExecError as msg:
+            print(f"Error: {msg}")

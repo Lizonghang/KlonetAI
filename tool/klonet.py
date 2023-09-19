@@ -182,31 +182,30 @@ class KlonetAddLinkTool(Tool):
     Args:
         src_node (str): The name of the source node.
         dst_node (str): The name of the destination node.
-        link_name (str, optional): The name of the link (default is None, to be auto-generated).
-            The name of this new link cannot be the same as existing links.
-        src_ip (str, optional): The source IP address (default is an empty string).
-        dst_ip (str, optional): The destination IP address (default is an empty string).
+        link_name (str): The name of the link. The name of this new link cannot be 
+            the same as existing links.
+        src_ip (str): The source IP address. Avoid using the first two and last IP 
+            addresses in the subnet. For example, avoid using 10.0.0.0, 10.0.0.1, 
+            and 10.0.0.255 in the subnet 10.0.0.0/24.
 
     Returns:
         None
     
     Example:
         # Replace "h1", "h2", "s1" with the names of nodes you want to link.
-        >>> klonet_add_link("h1", "s1", "l1")
-        >>> klonet_add_link("h2", "s1")  # Link name will be auto-generated.
+        >>> klonet_add_link("h1", "s1", "l1", "10.0.0.2/24")
+        >>> klonet_add_link("h2", "s1", "l2", "10.0.0.3/24")
     ''')
 
-    inputs = ["str", "str", "str", "str", "str"]
+    inputs = ["str", "str", "str", "str"]
 
     @handle_vemu_exec_error
-    def __call__(self, src_node: str, dst_node: str, link_name: str = None,
-                 src_ip: str = "", dst_ip: str = ""):
+    def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
         src_node = controller.nodes[src_node]
         dst_node = controller.nodes[dst_node]
-        link = controller.add_link(
-            src_node, dst_node, link_name, src_ip, dst_ip)
-        print(f"A link with name ({link.name}) was added between nodes {link.source} "
-              f"(ip: {link.sourceIP}) and {link.target} (ip: {link.targetIP})")
+        link = controller.add_link(src_node, dst_node, link_name, src_ip)
+        print(f"A link with name ({link.name}) was added between nodes "
+              f"{link.source} (IP: {link.sourceIP}) and {link.target}")
 
 
 class KlonetRuntimeAddLinkTool(Tool):
@@ -219,31 +218,30 @@ class KlonetRuntimeAddLinkTool(Tool):
     Args:
         src_node (str): The name of the source node.
         dst_node (str): The name of the destination node.
-        link_name (str, optional): The name of the link (default is None, to be auto-generated).
-            The name of this new link cannot be the same as existing links.
-        src_ip (str, optional): The source IP address (default is an empty string).
-        dst_ip (str, optional): The destination IP address (default is an empty string).
+        link_name (str): The name of the link. The name of this new link cannot be 
+            the same as existing links.
+        src_ip (str): The source IP address. Avoid using the first two and last IP 
+            addresses in the subnet. For example, avoid using 10.0.0.0, 10.0.0.1, 
+            and 10.0.0.255 in the subnet 10.0.0.0/24.
     
     Returns:
         None
     
     Example:
         # Replace "h1", "h2", "s1" with the names of nodes you want to link.
-        >>> klonet_runtime_add_link("h1", "s1", "l1")
-        >>> klonet_runtime_add_link("h2", "s1")  # Link name will be auto-generated.
+        >>> klonet_add_link("h1", "s1", "l1", "10.0.0.2/24")
+        >>> klonet_add_link("h2", "s1", "l2", "10.0.0.3/24")
     ''')
 
-    inputs = ["str", "str", "str", "str", "str"]
+    inputs = ["str", "str", "str", "str"]
 
     @handle_vemu_exec_error
-    def __call__(self, src_node: str, dst_node: str, link_name: str = None,
-                 src_ip: str = "", dst_ip: str = ""):
+    def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
         src_node = controller.nodes[src_node]
         dst_node = controller.nodes[dst_node]
-        controller.add_link_runtime(
-            src_node, dst_node, link_name, src_ip, dst_ip)
-        print(f"A link with name ({link_name}) was added between nodes {src_node.name} "
-              f"(ip: {src_ip}) and {dst_node.name} (ip: {dst_ip})")
+        controller.add_link_runtime(src_node, dst_node, link_name, src_ip)
+        print(f"A link with name ({link_name}) was added between nodes "
+              f"{src_node.name} (IP: {src_ip}) and {dst_node.name}")
 
 
 class KlonetRuntimeDeleteLinkTool(Tool):
@@ -387,3 +385,32 @@ class KlonetPortMappingTool(Tool):
     def __call__(self, node_name: str, container_port: int, host_port: int):
         success = controller.port_mapping(node_name, container_port, host_port)
         print(f"Port mapping on {node_name} is {'success' if success else 'failed'}")
+
+
+class KlonetGetIPTool(Tool):
+    name = "klonet_get_ip"
+    description = ('''
+    Retrieve the IP address of a Klonet node by its name. When you need 
+    to communicate with a target host, use this tool to retrieve the 
+    target IP address. For example, if h1 wants to ping h2, it should
+    call klonet_get_ip('h2') to retrieve its IP address (e.g., 10.0.0.1),
+    and then ping 10.0.0.1.
+    
+    Args:
+        node_name (str): The name of the Klonet node for which you want 
+            to retrieve the IP address.
+    
+    Returns:
+        str: The IP address of the specified Klonet node.
+    
+    Example:
+        >>> ip_address = klonet_get_ip('h1')
+        >>> print(ip_address)
+    ''')
+
+    inputs = ["str"]
+    outputs = ["str"]
+
+    def __call__(self, node_name: str):
+        ip = controller.nodes[node_name]['interfaces'][0]['ip']
+        return ip

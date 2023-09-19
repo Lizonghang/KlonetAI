@@ -16,6 +16,7 @@ from .klonet import (
     KlonetRuntimeDeleteLinkTool,
     KlonetSSHServiceTool,
     KlonetPortMappingTool,
+    KlonetGetIPTool,
 )
 from .gpt import SummarizeTool
 
@@ -35,6 +36,7 @@ free_tools = (
     KlonetRuntimeDeleteLinkTool,
     KlonetSSHServiceTool,
     KlonetPortMappingTool,
+    KlonetGetIPTool,
 )
 
 gpt_tools = (

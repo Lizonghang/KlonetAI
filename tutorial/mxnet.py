@@ -2,7 +2,7 @@ from transformers import Tool
 
 
 class MXNETTutorial(Tool):
-    name = "read_mxnet_tutorial"
+    name = "mxnet_tutorial"
     description = ('''
     MXNet supports distributed training enabling us to leverage multiple machines 
     for faster training. In this document, we describe how it works, how to 
@@ -33,4 +33,16 @@ class MXNETTutorial(Tool):
     # For two workers, run the following command for each of them.
     DMLC_ROLE=worker DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=9092 
     DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python demo.py --kvstore dist_sync
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    
+    Example:
+        >>> mxnet_tutorial()
     ''')
+
+    def __call__(self):
+        print(self.description)

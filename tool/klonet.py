@@ -479,13 +479,13 @@ class KlonetLinkConfigurationTool(Tool):
         config = {
             "link": link_name,
             "ne": node_name,
-            **({"bandwidth": bandwidth} if bandwidth > 0 else {}),
-            **({"delay": delay} if delay >= 0 else {}),
-            **({"delay_dist": delay_dist} if delay_dist else {}),
-            **({"jitter": jitter} if jitter >= 0 else {}),
+            **({"bw_kbps": bandwidth} if bandwidth > 0 else {}),
+            **({"delay_us": delay} if delay >= 0 else {}),
+            **({"delay_distribution": delay_dist} if delay_dist else {}),
+            **({"jitter_us": jitter} if jitter >= 0 else {}),
             **({"correlation": correlation} if correlation >= 0 else {}),
             **({"loss": loss} if loss >= 0 else {}),
-            **({"queue_size": queue_size} if queue_size >= 0 else {}),
+            **({"queue_size_bytes": queue_size} if queue_size >= 0 else {}),
         }
         # Reset the link configuration before modifying it.
         controller.reset_link(link_name, clean_cache=False)
@@ -494,7 +494,7 @@ class KlonetLinkConfigurationTool(Tool):
               f"with: {merged_config}")
 
 
-class ResetLinkConfigurationTool(Tool):
+class KlonetResetLinkConfigurationTool(Tool):
     name = "klonet_reset_link"
     description = ('''
     Reset the configuration of a given network link.

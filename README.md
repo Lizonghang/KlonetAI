@@ -17,13 +17,13 @@ from key import OpenAI_API_Key
 # Collect our KlonetAI tools.
 klonetai_tools = [obj() for obj in tool.free_tools] 
 klonetai_tools += [obj() for obj in tool.gpt_tools]  # note: these are not free.
-klonetai_tools += [obj() for obj in tutorial.tutorials]
+klonetai_tools += [obj() for obj in tutorial.base]
 
 # Instantiate the Agent with our KlonetAI tools.
 agent = OpenAiAgent(
-    model="gpt-3.5-turbo", 
+    model="gpt-3.5-turbo-16k", 
     api_key=OpenAI_API_Key, 
-    additional_tools=custom_tools
+    additional_tools=klonetai_tools
 )
 
 # Replace the default summarizer with our GPT summarizer.
@@ -97,7 +97,7 @@ Deploy project klonetai success.
 
 ```python
 # Now, let us execute some commands in these hosts:
->>> agent.chat("all host nodes ping h1")
+>>> agent.chat("All host nodes ping h1.")
 ```
 ```text
 Outputs:

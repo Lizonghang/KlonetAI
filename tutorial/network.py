@@ -6,7 +6,7 @@ class NetworkTutorial(Tool):
     description = ('''
     [Q] How to measure data transfer rate / bandwidth between any two hosts ?
     [A] Take host nodes h1 and h2 as an example, follow these two steps:
-        1. Start the iperf server on host node h2.
+        1. Start the iperf server on host node h2 as a deamon process.
         2. Launch the iperf client on host node h1. Ensure to convert h2 to
         its IP address as name resolution is not available.
     Args:

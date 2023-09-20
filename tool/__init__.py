@@ -18,6 +18,7 @@ from .klonet import (
     KlonetPortMappingTool,
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
+    KlonetResetLinkConfigurationTool,
 )
 from .gpt import SummarizeTool
 
@@ -39,6 +40,7 @@ free_tools = (
     KlonetPortMappingTool,
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
+    KlonetResetLinkConfigurationTool,
 )
 
 gpt_tools = (

@@ -384,8 +384,7 @@ class KlonetPortMappingTool(Tool):
 class KlonetGetPortMappingTool(Tool):
     name = "klonet_get_port_mapping"
     description = ('''
-    Show the port map and worker IP for a given node. The worker IP is the
-    IP address of the host machine where the current node is deployed on.
+    Show the port map for a given node. 
     
     Args:
         node_name (str): The name of the node to query.
@@ -402,8 +401,7 @@ class KlonetGetPortMappingTool(Tool):
     @error_handler
     def __call__(self, node_name: str):
         result = controller.get_port_mapping(node_name)
-        print(f"Worker IP: {result['worker_ip']}. \n"
-              f"Port Map: {result['ne_port']}")
+        print(f"Port map: {result['ne_port']}")
 
 
 class KlonetGetIPTool(Tool):
@@ -530,3 +528,29 @@ class KlonetResetLinkConfigurationTool(Tool):
     def __call__(self, link_name: str):
         controller.reset_link(link_name, clean_cache=True)
         print(f"Link {link_name} has been reset.")
+
+
+class KlonetGetWorkerIPTool(Tool):
+    name = "klonet_get_worker_ip"
+    description = ('''
+    Show the worker IP for a given node. The worker IP is the IP address 
+    of the host machine where the given node is deployed on.
+
+    Args:
+        node_name (str, optional): The name of the node to query. If given,
+            query only the given node. If not given, query the worker IP of
+            all the nodes.
+
+    Returns:
+        None
+
+    Example:
+        >>> klonet_get_worker_ip()
+    ''')
+
+    inputs = ["str"]
+
+    @error_handler
+    def __call__(self, node_name: str = None):
+        result = controller.get_worker_id(node_name)
+        print(f"Worker IP: {result}")

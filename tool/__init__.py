@@ -20,6 +20,7 @@ from .klonet import (
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
     KlonetResetLinkConfigurationTool,
+    KlonetGetWorkerIPTool,
 )
 from .gpt import SummarizeTool
 
@@ -43,6 +44,7 @@ free_tools = (
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
     KlonetResetLinkConfigurationTool,
+    KlonetGetWorkerIPTool,
 )
 
 gpt_tools = (

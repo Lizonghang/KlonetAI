@@ -115,3 +115,6 @@ class KlonetController:
 
     def get_port_mapping(self, node_name):
         return self._node_manager.get_port_mapping(node_name)
+
+    def get_worker_id(self, node_name=None):
+        return self._node_manager.get_node_worker_ip(node_name)

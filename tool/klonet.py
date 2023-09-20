@@ -1,6 +1,6 @@
 from transformers import Tool
 from controller import KlonetController
-from klonet_api import VemuExecError
+from klonet_api import VemuExecError, LinkInconsistentError
 
 PROJECT_NAME = "klonetai"
 USER_NAME = "wudx"
@@ -12,7 +12,17 @@ def handle_vemu_exec_error(func):
         try:
             return func(*args, **kwargs)
         except VemuExecError as msg:
-            print(f"[Error] {msg}")
+            print(f"[VemuExecError] {msg}")
+
+    return wrapper
+
+
+def handle_link_inconsistent_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except LinkInconsistentError as msg:
+            print(f"[LinkInconsistentError] {msg}")
 
     return wrapper
 
@@ -64,22 +74,21 @@ class KlonetViewTopoTool(Tool):
 class KlonetAddNodeTool(Tool):
     name = "klonet_add_node"
     description = ('''
-    Add a node to the Klonet network. 
+    Add a node to the Klonet network. The node with position (x, y) cannot overlap with
+    other nodes.
     
     Args:
-        name (str, optional): The name of the node being added. The name of this 
+        name (str): The name of the node being added. The name of this 
             new node cannot be the same as existing nodes.
-        image (str, optional): The name of Docker image used by the node.
+        image (str): The name of Docker image used by the node.
+        x (int): The x-coordinate of the node on the canvas. It should be set as an integer 
+            value between 0 and 700. The agent should set this for pretty visual layout.
+        y (int): The y-coordinate of the node on the canvas. It should be set as an integer 
+            value between 0 and 700. The agent should set this for pretty visual layout.
         cpu_limit (int, optional): CPU utilization limit for the node, unit: %, 
             default to None, which will use the default cpu limits from the Docker image.
         mem_limit (int, optional): Memory utilization limit for the node, unit: Mbytes, 
             default to None, which will use the default memory limits from the Docker image.
-        x (int, optional): The x-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 700. The agent should set this
-            for pretty visual layout.
-        y (int, optional): The y-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 700. The agent should set this
-            for pretty visual layout.
     
     Returns:
         None
@@ -88,19 +97,14 @@ class KlonetAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
 
     Example:
-        # Add two host nodes (h1, h2) using the klonet_add_node function.
-        >>> klonet_add_node("h1", "ubuntu", x=500, y=500)
-        >>> klonet_add_node("h2", "ubuntu", cpu_limit=1000, mem_limit=1000)
-
-        # Add an ovs node (s1) using the klonet_add_node function.
-        >>> klonet_add_node("s1", "ovs")
+        >>> klonet_add_node("h1", "ubuntu", x=500, y=500, cpu_limit=1000, mem_limit=1000)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
 
     @handle_vemu_exec_error
-    def __call__(self, name: str = "", image: str = "ubuntu", cpu_limit: int = None,
-                 mem_limit: int = None, x: int = 0, y: int = 0):
+    def __call__(self, name: str, image: str, x: int, y: int,
+                 cpu_limit: int = None, mem_limit: int = None):
         node = controller.add_node(
             name, controller.images[image], cpu_limit, mem_limit, x, y)
         print(f"A new node (name: {node.name}, image: {node.image_name}, "
@@ -111,22 +115,21 @@ class KlonetRuntimeAddNodeTool(Tool):
     name = "klonet_runtime_add_node"
     description = ('''
     Add a node to the Klonet network. This tool is designed for post-deployment 
-    use, allowing adding nodes to the network during runtime. 
+    use, allowing adding nodes to the network during runtime. The node with position 
+    (x, y) cannot overlap with other nodes.
     
     Args:
-        name (str, optional): The name of the node being added. Be sure not 
+        name (str): The name of the node being added. Be sure not 
             to use the same name as existing nodes.
-        image (str, optional): The name of Docker image used by the node.
+        image (str): The name of Docker image used by the node.
+        x (int): The x-coordinate of the node on the canvas. It should be set as an integer 
+            value between 0 and 700. The agent should set this for pretty visual layout.
+        y (int): The y-coordinate of the node on the canvas. It should be set as an integer 
+            value between 0 and 700. The agent should set this for pretty visual layout.
         cpu_limit (int, optional): CPU utilization limit for the node, unit: %, 
             default to None, which will use the default cpu limits from the Docker image.
         mem_limit (int, optional): Memory utilization limit for the node, unit: Mbytes, 
             default to None, which will use the default memory limits from the Docker image.
-        x (int, optional): The x-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 700. The agent should set this
-            for pretty visual layout.
-        y (int, optional): The y-coordinate of the node on the canvas. The default value is 0.
-            It should be set as an integer value between 0 and 700. The agent should set this
-            for pretty visual layout.
 
     Returns:
         None
@@ -135,14 +138,14 @@ class KlonetRuntimeAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
     
     Example:
-        >>> klonet_runtime_add_node("h3", "ubuntu")
+        >>> klonet_runtime_add_node("h3", "ubuntu", x=500, y=500, cpu_limit=1000, mem_limit=1000)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
 
     @handle_vemu_exec_error
-    def __call__(self, name: str = "", image: str = "ubuntu", cpu_limit: int = None,
-                 mem_limit: int = None, x: int = 0, y: int = 0):
+    def __call__(self, name: str, image: str, x: int, y: int,
+                 cpu_limit: int = None, mem_limit: int = None):
         node = controller.add_node_runtime(
             name, controller.images[image], cpu_limit, mem_limit, x, y)
         print(f"A new node (name: {node.name}, image: {node.image_name}, "
@@ -308,6 +311,7 @@ class KlonetDestroyProjectTool(Tool):
     @handle_vemu_exec_error
     def __call__(self):
         controller.reset_project()
+        print("This project has been deleted.")
 
 
 class KlonetCommandExecTool(Tool):
@@ -414,3 +418,99 @@ class KlonetGetIPTool(Tool):
     def __call__(self, node_name: str):
         ip = controller.nodes[node_name]['interfaces'][0]['ip']
         return ip
+
+
+class KlonetLinkConfigurationTool(Tool):
+    name = "klonet_configure_link"
+    description = ('''
+    This tool allows you to customize the network link settings for a specific node,
+    including bandwidth, delay, jitter, packet loss, and queue size, to simulate 
+    various network conditions. 
+    
+    Args:
+        link_name (str): The name of the link to configure.
+        node_name (str): The name of the node to which the link is connected.
+        bandwidth (int, optional): The desired link bandwidth in kbps (must be a 
+            positive value).
+        delay (int, optional): The desired link delay in microseconds (must be a 
+            non-negative value).
+        delay_dist (str, optional): The distribution of delay variations. Options 
+            include: uniform, normal, pareto, and paretonomal.
+        jitter (int, optional): The desired jitter in microseconds (must be a 
+            non-negative value).
+        correlation (int, optional): The percentage of jitter correlation (must 
+            be a non-negative percentage).
+        loss (int, optional): The desired packet loss percentage (must be a 
+            non-negative percentage).
+        queue_size (int, optional): The desired queue size in bytes (must be a 
+            non-negative value).
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_configure_link(
+                'l1', 'h1', 
+                bandwidth = 1000, 
+                delay = 30, 
+                delay_dist = 'normal',
+                jitter = 100,
+                correlation = 1,
+                loss = 1,
+                queue_size = 200000
+            )
+    ''')
+
+    inputs = ["str", "str", "int", "int", "str", "int", "int", "int", "int"]
+
+    @handle_link_inconsistent_error
+    def __call__(
+        self,
+        link_name: str,
+        node_name: str,
+        bandwidth: int = -1,
+        delay: int = -1,
+        delay_dist: str = "",
+        jitter: int = -1,
+        correlation: int = -1,
+        loss: int = -1,
+        queue_size: int = -1
+    ):
+        config = {
+            "link": link_name,
+            "ne": node_name,
+            **({"bandwidth": bandwidth} if bandwidth > 0 else {}),
+            **({"delay": delay} if delay >= 0 else {}),
+            **({"delay_dist": delay_dist} if delay_dist else {}),
+            **({"jitter": jitter} if jitter >= 0 else {}),
+            **({"correlation": correlation} if correlation >= 0 else {}),
+            **({"loss": loss} if loss >= 0 else {}),
+            **({"queue_size": queue_size} if queue_size >= 0 else {}),
+        }
+        # Reset the link configuration before modifying it.
+        controller.reset_link(link_name, clean_cache=False)
+        merged_config = controller.configure_link(config)
+        print(f"Link {link_name} (on the {node_name} side) is configured "
+              f"with: {merged_config}")
+
+
+class ResetLinkConfigurationTool(Tool):
+    name = "klonet_reset_link"
+    description = ('''
+    Reset the configuration of a given network link.
+    
+    Args:
+        link_name (str): The name of the link to reset.
+
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_reset_link('l1')
+    ''')
+
+    inputs = ["str"]
+
+    def __call__(self, link_name: str):
+        controller.reset_link(link_name, clean_cache=True)
+        print(f"Link {link_name} has been reset.")

@@ -17,6 +17,8 @@ class KlonetController:
         self._cmd_manager = CmdManager(user, project, self._backend_host, self._port)
         self._topo = Topo()
 
+        self._link_config = {}
+
     @property
     def images(self):
         return self._images
@@ -66,6 +68,34 @@ class KlonetController:
 
     def delete_link_runtime(self, link_name):
         self._link_manager.dynamic_delete_link(link_name)
+
+    def configure_link(self, config):
+        link_name = config["link"]
+        _ = self._link_config.setdefault(link_name, {})
+
+        node_name = config["ne"]
+        src_node = self.links[link_name].source
+        dst_node = self.links[link_name].target
+        src_link_config = _.setdefault(src_node, {})
+        dst_link_config = _.setdefault(dst_node, {})
+
+        if node_name == src_node:
+            src_link_config.update(**config)
+            dst_link_config.update({"link": link_name, "ne": dst_node})
+        elif node_name == dst_node:
+            src_link_config.update({"link": link_name, "ne": src_node})
+            dst_link_config.update(**config)
+        else:
+            raise LinkInconsistentError(f"Node {node_name} is not on link {link_name}.")
+
+        src_config_obj = LinkConfiguration(**src_link_config)
+        dst_config_obj = LinkConfiguration(**dst_link_config)
+        self._link_manager.config_link(src_config_obj, dst_config_obj)
+        return src_link_config if node_name == src_node else dst_link_config
+
+    def reset_link(self, link_name, clean_cache=False):
+        self._link_manager.clear_link_configuration(link_name)
+        if clean_cache: self._link_config.clear()
 
     def deploy(self):
         self._project_manager.deploy(self._project, self._topo)

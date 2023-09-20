@@ -112,3 +112,6 @@ class KlonetController:
     def port_mapping(self, node_name, container_port, host_port):
         return self._node_manager.modify_port_mapping(
             node_name, [container_port, host_port])
+
+    def get_port_mapping(self, node_name):
+        return self._node_manager.get_port_mapping(node_name)

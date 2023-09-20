@@ -7,22 +7,12 @@ USER_NAME = "wudx"
 controller = KlonetController(PROJECT_NAME, USER_NAME)
 
 
-def handle_vemu_exec_error(func):
+def error_handler(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except VemuExecError as msg:
-            print(f"[VemuExecError] {msg}")
-
-    return wrapper
-
-
-def handle_link_inconsistent_error(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except LinkInconsistentError as msg:
-            print(f"[LinkInconsistentError] {msg}")
+        except Exception as msg:
+            print(f"[Error] {msg}")
 
     return wrapper
 
@@ -45,7 +35,7 @@ class KlonetGetAllImagesTool(Tool):
         {'ubuntu': <ImageObject1>, 'ovs': <ImageObject2>, ...}
     ''')
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self):
         return controller.images().keys()
 
@@ -59,7 +49,7 @@ class KlonetViewTopoTool(Tool):
         >>> klonet_view_topo()
     ''')
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self):
         node_info = {
             name: obj.image_name
@@ -102,7 +92,7 @@ class KlonetAddNodeTool(Tool):
 
     inputs = ["str", "str", "int", "int", "int", "int"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, name: str, image: str, x: int, y: int,
                  cpu_limit: int = None, mem_limit: int = None):
         node = controller.add_node(
@@ -143,7 +133,7 @@ class KlonetRuntimeAddNodeTool(Tool):
 
     inputs = ["str", "str", "int", "int", "int", "int"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, name: str, image: str, x: int, y: int,
                  cpu_limit: int = None, mem_limit: int = None):
         node = controller.add_node_runtime(
@@ -171,7 +161,7 @@ class KlonetRuntimeDeleteNodeTool(Tool):
 
     inputs = ["str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, name: str):
         controller.delete_node_runtime(name)
         print(f"Node {name} has been removed.")
@@ -202,7 +192,7 @@ class KlonetAddLinkTool(Tool):
 
     inputs = ["str", "str", "str", "str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
         src_node = controller.nodes[src_node]
         dst_node = controller.nodes[dst_node]
@@ -238,7 +228,7 @@ class KlonetRuntimeAddLinkTool(Tool):
 
     inputs = ["str", "str", "str", "str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
         src_node = controller.nodes[src_node]
         dst_node = controller.nodes[dst_node]
@@ -266,7 +256,7 @@ class KlonetRuntimeDeleteLinkTool(Tool):
 
     inputs = ["str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, name: str):
         controller.delete_link_runtime(name)
         print(f"Link {name} has been removed.")
@@ -287,7 +277,7 @@ class KlonetDeployTool(Tool):
         >>> klonet_deploy_network()
     ''')
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self):
         controller.deploy()
         print(f"Deploy project {PROJECT_NAME} success.")
@@ -308,7 +298,7 @@ class KlonetDestroyProjectTool(Tool):
         >>> klonet_destroy_project()
     ''')
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self):
         controller.reset_project()
         print("This project has been deleted.")
@@ -335,7 +325,7 @@ class KlonetCommandExecTool(Tool):
     inputs = ["str", "str"]
     outputs = ["str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, node_name: str, command: str):
         response = controller.execute(node_name, command)
         return response[node_name][command]['output'].strip()
@@ -358,7 +348,7 @@ class KlonetSSHServiceTool(Tool):
 
     inputs = ["str"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, node_name: str):
         success = controller.enable_ssh_service(node_name)
         print(f"SSH service on {node_name} started {'success' if success else 'failed'}.")
@@ -385,7 +375,7 @@ class KlonetPortMappingTool(Tool):
 
     inputs = ["str", "int", "int"]
 
-    @handle_vemu_exec_error
+    @error_handler
     def __call__(self, node_name: str, container_port: int, host_port: int):
         success = controller.port_mapping(node_name, container_port, host_port)
         print(f"Port mapping on {node_name} is {'success' if success else 'failed'}")
@@ -415,6 +405,7 @@ class KlonetGetIPTool(Tool):
     inputs = ["str"]
     outputs = ["str"]
 
+    @error_handler
     def __call__(self, node_name: str):
         ip = controller.nodes[node_name]['interfaces'][0]['ip']
         return ip
@@ -463,7 +454,7 @@ class KlonetLinkConfigurationTool(Tool):
 
     inputs = ["str", "str", "int", "int", "str", "int", "int", "int", "int"]
 
-    @handle_link_inconsistent_error
+    @error_handler
     def __call__(
         self,
         link_name: str,
@@ -511,6 +502,7 @@ class KlonetResetLinkConfigurationTool(Tool):
 
     inputs = ["str"]
 
+    @error_handler
     def __call__(self, link_name: str):
         controller.reset_link(link_name, clean_cache=True)
         print(f"Link {link_name} has been reset.")

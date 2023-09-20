@@ -27,17 +27,17 @@ class KlonetGetAllImagesTool(Tool):
         None
 
     Returns:
-        None
+        str: The name of Docker images.
 
     Example:
         >>> images = klonet_get_all_images()
         >>> print(images)
-        {'ubuntu': <ImageObject1>, 'ovs': <ImageObject2>, ...}
     ''')
 
     @error_handler
     def __call__(self):
-        return controller.images().keys()
+        image_names = controller.images.keys()
+        return '\n'.join(image_names)
 
 
 class KlonetViewTopoTool(Tool):
@@ -378,7 +378,32 @@ class KlonetPortMappingTool(Tool):
     @error_handler
     def __call__(self, node_name: str, container_port: int, host_port: int):
         success = controller.port_mapping(node_name, container_port, host_port)
-        print(f"Port mapping on {node_name} is {'success' if success else 'failed'}")
+        print(f"Port mapping on {node_name} {'success' if success else 'failed'}.")
+
+
+class KlonetGetPortMappingTool(Tool):
+    name = "klonet_get_port_mapping"
+    description = ('''
+    Show the port map and worker IP for a given node. The worker IP is the
+    IP address of the host machine where the current node is deployed on.
+    
+    Args:
+        node_name (str): The name of the node to query.
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_get_port_mapping()
+    ''')
+
+    inputs = ["str"]
+
+    @error_handler
+    def __call__(self, node_name: str):
+        result = controller.get_port_mapping(node_name)
+        print(f"Worker IP: {result['worker_ip']}. \n"
+              f"Port Map: {result['ne_port']}")
 
 
 class KlonetGetIPTool(Tool):
@@ -395,7 +420,7 @@ class KlonetGetIPTool(Tool):
             to retrieve the IP address.
     
     Returns:
-        str: The IP address of the specified Klonet node.
+        str: The IP address of the specified node.
     
     Example:
         >>> ip_address = klonet_get_ip('h1')
@@ -407,8 +432,7 @@ class KlonetGetIPTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str):
-        ip = controller.nodes[node_name]['interfaces'][0]['ip']
-        return ip
+        return controller.nodes[node_name].interfaces[0]['ip']
 
 
 class KlonetLinkConfigurationTool(Tool):

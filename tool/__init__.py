@@ -24,9 +24,12 @@ from .klonet import (
 )
 from .gpt import SummarizeTool
 
-free_tools = (
+base = (
     GetCurrentDateTimeTool,
     GetCurrentDayTool,
+)
+
+klonet = (
     KlonetAddLinkTool,
     KlonetAddNodeTool,
     KlonetCommandExecTool,
@@ -47,6 +50,6 @@ free_tools = (
     KlonetGetWorkerIPTool,
 )
 
-gpt_tools = (
+gpt = (
     SummarizeTool,
 )

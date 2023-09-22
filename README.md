@@ -10,13 +10,14 @@ is used for, as below.
 ```python
 import tool
 import tutorial
-import inspect
 from transformers.tools import OpenAiAgent
 from key import OpenAI_API_Key
+from tool.klonet import controller
 
-# Collect our KlonetAI tools.
-klonetai_tools = [obj() for obj in tool.free_tools] 
-klonetai_tools += [obj() for obj in tool.gpt_tools]  # note: these are not free.
+# Collect our tools.
+klonetai_tools =  [obj() for obj in tool.base]
+klonetai_tools += [obj() for obj in tool.klonet]
+# klonetai_tools += [obj() for obj in tool.gpt]  # note: these are not free.
 klonetai_tools += [obj() for obj in tutorial.base]
 
 # Instantiate the Agent with our KlonetAI tools.
@@ -31,6 +32,13 @@ agent.toolbox["summarizer"] = tool.SummarizeTool()
 
 # List all tools we have.
 print(agent.toolbox.keys())
+
+# Log in Klonet backend.
+project_name = "klonetai"  # Replace it with your own project name.
+user_name = "<Registered-Username>"  # Replace it with your own user name.
+host_ip = "<Host-IP>"  # Replace it with Klonet backend IP.
+port = <Port>  # Replace it with Klonet backend port number.
+controller.login(project_name, user_name, host_ip, port)
 ```
 
 Next, we can use <code>agent</code> to interact with KlonetAI. For example:

@@ -3,21 +3,23 @@ from klonet_api import *
 
 class KlonetController:
 
-    def __init__(self, project, user):
-        self._backend_host = "kb310server.f3322.net"
-        self._port = 12313
-        self._project = project
-        self._user = user
-
-        self._image_manager = ImageManager(user, self._backend_host, self._port)
-        self._images = self._image_manager.get_images()
-        self._project_manager = ProjectManager(user, self._backend_host, self._port)
-        self._node_manager = NodeManager(user, project, self._backend_host, self._port)
-        self._link_manager = LinkManager(user, project, self._backend_host, self._port)
-        self._cmd_manager = CmdManager(user, project, self._backend_host, self._port)
+    def __init__(self):
+        self._backend_host = ""
+        self._port = 0
+        self._project = ""
+        self._user = ""
+        self._image_manager = None
+        self._images = []
+        self._project_manager = None
+        self._node_manager = None
+        self._link_manager = None
+        self._cmd_manager = None
         self._topo = Topo()
-
         self._link_config = {}
+
+    @property
+    def project_name(self):
+        return self._project
 
     @property
     def images(self):
@@ -34,6 +36,18 @@ class KlonetController:
     @property
     def links(self):
         return self._topo.get_links()
+
+    def login(self, project_name, user_name, host_ip, port):
+        self._project = project_name
+        self._user = user_name
+        self._backend_host = host_ip
+        self._port = port
+        self._image_manager = ImageManager(self._user, self._backend_host, self._port)
+        self._images = self._image_manager.get_images()
+        self._project_manager = ProjectManager(self._user, self._backend_host, self._port)
+        self._node_manager = NodeManager(self._user, project, self._backend_host, self._port)
+        self._link_manager = LinkManager(self._user, project, self._backend_host, self._port)
+        self._cmd_manager = CmdManager(self._user, project, self._backend_host, self._port)
 
     def reset_project(self):
         self._topo = Topo()

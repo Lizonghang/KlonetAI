@@ -1,10 +1,8 @@
 from transformers import Tool
 from controller import KlonetController
-from klonet_api import VemuExecError, LinkInconsistentError
 
-PROJECT_NAME = "klonetai"
-USER_NAME = "wudx"
-controller = KlonetController(PROJECT_NAME, USER_NAME)
+
+controller = KlonetController()
 
 
 def error_handler(func):
@@ -280,7 +278,7 @@ class KlonetDeployTool(Tool):
     @error_handler
     def __call__(self):
         controller.deploy()
-        print(f"Deploy project {PROJECT_NAME} success.")
+        print(f"Deploy project {controller.project_name} success.")
 
 
 class KlonetDestroyProjectTool(Tool):

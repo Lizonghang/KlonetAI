@@ -8,6 +8,7 @@ from .klonet import (
     KlonetCommandExecTool,
     KlonetRuntimeDeleteNodeTool,
     KlonetDeployTool,
+    KlonetCheckDeployedTool,
     KlonetGetAllImagesTool,
     KlonetViewTopoTool,
     KlonetDestroyProjectTool,
@@ -20,6 +21,7 @@ from .klonet import (
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
     KlonetResetLinkConfigurationTool,
+    KlonetLinkQueryTool,
     KlonetGetWorkerIPTool,
 )
 from .gpt import SummarizeTool
@@ -35,6 +37,7 @@ klonet = (
     KlonetCommandExecTool,
     KlonetRuntimeDeleteNodeTool,
     KlonetDeployTool,
+    KlonetCheckDeployedTool,
     KlonetGetAllImagesTool,
     KlonetViewTopoTool,
     KlonetDestroyProjectTool,
@@ -52,4 +55,8 @@ klonet = (
 
 gpt = (
     SummarizeTool,
+)
+
+test = (
+    KlonetLinkQueryTool,
 )

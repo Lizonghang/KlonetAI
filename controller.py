@@ -1,4 +1,19 @@
+import requests
 from klonet_api import *
+
+
+def http_response_handler(response, func):
+    if response.status_code != 200:
+        err_msg = f"Request failed with status code {response.status_code}"
+        return err_msg
+    else:
+        data = response.json()
+        code = data.get("code", 1)
+        msg = data.get("msg", "Unknown")
+        if code == 0:
+            return f"Request failed. Error message: {msg}"
+        else:
+            return func(data)
 
 
 class KlonetController:
@@ -22,12 +37,39 @@ class KlonetController:
         return self._project
 
     @property
+    def user(self):
+        return self._user
+
+    @property
+    def backend_host(self):
+        return self._backend_host
+
+    @property
+    def port(self):
+        return self._port
+
+    @property
     def images(self):
         return self._images
 
     @property
     def topo(self):
         return self._topo
+
+    @property
+    def remote_topo(self):
+        ip = self._backend_host
+        port = self._port
+        project = self._project
+        user = self._user
+        url = f"http://{ip}:{port}/re/project/{project}/?user={user}"
+        response = requests.get(url)
+
+        def get_topo(data_json):
+            project_info = data_json.get('project', {})
+            topo = project_info.get('topo', 'No topo data')
+            return topo
+        return http_response_handler(response, get_topo)
 
     @property
     def nodes(self):
@@ -111,8 +153,24 @@ class KlonetController:
         self._link_manager.clear_link_configuration(link_name)
         if clean_cache: self._link_config.clear()
 
+    def query_link(self, link_name, node_name):
+        # TODO: To be added.
+        return None
+
     def deploy(self):
         self._project_manager.deploy(self._project, self._topo)
+
+    def check_deployed(self):
+        ip = self._backend_host
+        port = self._port
+        user = self._user
+        project = self._project
+        url = f"http://{ip}:{port}/master/topo/?user={user}&topo={project}"
+        response = requests.get(url)
+
+        def get_deploy_status(data_json):
+            return data_json["stat"]
+        return http_response_handler(response, get_deploy_status)
 
     def execute(self, node_name, command):
         response = self._cmd_manager.exec_cmds_in_nodes({

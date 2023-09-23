@@ -41,7 +41,7 @@ class KlonetGetAllImagesTool(Tool):
 class KlonetViewTopoTool(Tool):
     name = "klonet_view_topo"
     description = ('''
-    Overview the current network topology on Klonet.
+    Overview the current network topology on Klonet backend.
     
     Example:
         >>> klonet_view_topo()
@@ -49,14 +49,8 @@ class KlonetViewTopoTool(Tool):
 
     @error_handler
     def __call__(self):
-        node_info = {
-            name: obj.image_name
-            for name, obj in controller.nodes.items()}
-        link_info = {
-            name: (obj.source, obj.target)
-            for name, obj in controller.links.items()}
-        msg = f"Nodes: {node_info}\nLinks: {link_info}"
-        print(msg)
+        result = controller.remote_topo
+        print(result)
 
 
 class KlonetAddNodeTool(Tool):
@@ -279,6 +273,30 @@ class KlonetDeployTool(Tool):
     def __call__(self):
         controller.deploy()
         print(f"Deploy project {controller.project_name} success.")
+
+
+class KlonetCheckDeployedTool(Tool):
+    name = "klonet_check_deployed"
+    description = ('''
+    Check whether the network is deployed on remote Klonet backend. 
+    Run this tool to confirm whether some operations can be performed. 
+    
+    Args:
+        None
+    
+    Returns:
+        bool: True if the network has been deployed, False otherwise.
+    
+    Example:
+        >>> is_deployed = klonet_check_deployed()
+        >>> print(f"Is this project deployed: {is_deployed}.")
+    ''')
+
+    outputs = ["bool"]
+
+    @error_handler
+    def __call__(self):
+        return controller.check_deployed()
 
 
 class KlonetDestroyProjectTool(Tool):
@@ -526,6 +544,30 @@ class KlonetResetLinkConfigurationTool(Tool):
     def __call__(self, link_name: str):
         controller.reset_link(link_name, clean_cache=True)
         print(f"Link {link_name} has been reset.")
+
+
+class KlonetLinkQueryTool(Tool):
+    name = "klonet_link_query"
+    description = ('''
+    Query information about a link.
+    
+    Args:
+        link_name (str): The name of the link to query.
+        node_name (str): The name of the node associated with the link to query.
+    
+    Returns:
+        dict: A dictionary containing information about the queried link.
+    
+    Example:
+        >>> link_info = klonet_link_query("l1", "h1")
+    ''')
+
+    inputs = ["str", "str"]
+    outputs = ["dict"]
+
+    def __call__(self, link_name: str, node_name: str):
+        # TODO: To be added.
+        return controller.query_link(link_name, node_name)
 
 
 class KlonetGetWorkerIPTool(Tool):

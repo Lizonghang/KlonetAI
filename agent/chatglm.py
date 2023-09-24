@@ -10,7 +10,8 @@ class ChatGLMAgent(Agent):
     Agent that uses ChatGLM Inference SDK to generate code.
 
     Args:
-        model_name (`str`): The name of the model to be used, could be "chatglm_pro", "chatglm_std", or "chatglm_lite".
+        model_name (`str`): The name of the model to be used, could be "chatglm_pro", "chatglm_std", "chatglm_lite",
+            or "chatglm_lite_32k".
         chat_prompt_template (`str`, *optional*):
             Pass along your own prompt if you want to override the default template for the `chat` method. Can be the
             actual prompt template or a repo ID (on the Hugging Face Hub). The prompt should be in a file named
@@ -44,7 +45,6 @@ class ChatGLMAgent(Agent):
             model=self.model_name,
             prompt=[{"role": "user", "content": prompt}],
             temperature=0,
-            stop=stop,
         )
 
         if response["code"] != 200:

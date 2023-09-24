@@ -1,18 +1,8 @@
 from transformers import Tool
-from controller import KlonetController
+from klonetai import KlonetAI, error_handler
 
 
-controller = KlonetController()
-
-
-def error_handler(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as msg:
-            print(f"[Error] {msg}")
-
-    return wrapper
+kai = KlonetAI()
 
 
 class KlonetGetAllImagesTool(Tool):
@@ -25,17 +15,15 @@ class KlonetGetAllImagesTool(Tool):
         None
 
     Returns:
-        str: The name of Docker images.
+        None
 
     Example:
-        >>> images = klonet_get_all_images()
-        >>> print(images)
+        >>> klonet_get_all_images()
     ''')
 
     @error_handler
     def __call__(self):
-        image_names = controller.images.keys()
-        return '\n'.join(image_names)
+        kai.images.keys()
 
 
 class KlonetViewTopoTool(Tool):
@@ -49,7 +37,7 @@ class KlonetViewTopoTool(Tool):
 
     @error_handler
     def __call__(self):
-        result = controller.remote_topo
+        result = kai.remote_topo
         print(result)
 
 
@@ -79,7 +67,7 @@ class KlonetAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
 
     Example:
-        >>> klonet_add_node("h1", "ubuntu", x=500, y=500, cpu_limit=1000, mem_limit=1000)
+        >>> klonet_add_node("h1", "ubuntu", x=500, y=500)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
@@ -87,8 +75,8 @@ class KlonetAddNodeTool(Tool):
     @error_handler
     def __call__(self, name: str, image: str, x: int, y: int,
                  cpu_limit: int = None, mem_limit: int = None):
-        node = controller.add_node(
-            name, controller.images[image], cpu_limit, mem_limit, x, y)
+        node = kai.add_node(
+            name, kai.images[image], cpu_limit, mem_limit, x, y)
         print(f"A new node (name: {node.name}, image: {node.image_name}, "
               f"resource limit: {node.resource_limit}) have been added to the network.")
 
@@ -120,7 +108,7 @@ class KlonetRuntimeAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
     
     Example:
-        >>> klonet_runtime_add_node("h3", "ubuntu", x=500, y=500, cpu_limit=1000, mem_limit=1000)
+        >>> klonet_runtime_add_node("h3", "ubuntu", x=500, y=500)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
@@ -128,8 +116,8 @@ class KlonetRuntimeAddNodeTool(Tool):
     @error_handler
     def __call__(self, name: str, image: str, x: int, y: int,
                  cpu_limit: int = None, mem_limit: int = None):
-        node = controller.add_node_runtime(
-            name, controller.images[image], cpu_limit, mem_limit, x, y)
+        node = kai.add_node_runtime(
+            name, kai.images[image], cpu_limit, mem_limit, x, y)
         print(f"A new node (name: {node.name}, image: {node.image_name}, "
               f"resource limit: {node.resource_limit}) have been added to the network.")
 
@@ -155,7 +143,7 @@ class KlonetRuntimeDeleteNodeTool(Tool):
 
     @error_handler
     def __call__(self, name: str):
-        controller.delete_node_runtime(name)
+        kai.delete_node_runtime(name)
         print(f"Node {name} has been removed.")
 
 
@@ -186,9 +174,9 @@ class KlonetAddLinkTool(Tool):
 
     @error_handler
     def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
-        src_node = controller.nodes[src_node]
-        dst_node = controller.nodes[dst_node]
-        link = controller.add_link(src_node, dst_node, link_name, src_ip)
+        src_node = kai.nodes[src_node]
+        dst_node = kai.nodes[dst_node]
+        link = kai.add_link(src_node, dst_node, link_name, src_ip)
         print(f"A link with name ({link.name}) was added between nodes "
               f"{link.source} (IP: {link.sourceIP}) and {link.target}")
 
@@ -222,9 +210,9 @@ class KlonetRuntimeAddLinkTool(Tool):
 
     @error_handler
     def __call__(self, src_node: str, dst_node: str, link_name: str, src_ip: str):
-        src_node = controller.nodes[src_node]
-        dst_node = controller.nodes[dst_node]
-        controller.add_link_runtime(src_node, dst_node, link_name, src_ip)
+        src_node = kai.nodes[src_node]
+        dst_node = kai.nodes[dst_node]
+        kai.add_link_runtime(src_node, dst_node, link_name, src_ip)
         print(f"A link with name ({link_name}) was added between nodes "
               f"{src_node.name} (IP: {src_ip}) and {dst_node.name}")
 
@@ -250,7 +238,7 @@ class KlonetRuntimeDeleteLinkTool(Tool):
 
     @error_handler
     def __call__(self, name: str):
-        controller.delete_link_runtime(name)
+        kai.delete_link_runtime(name)
         print(f"Link {name} has been removed.")
 
 
@@ -271,8 +259,8 @@ class KlonetDeployTool(Tool):
 
     @error_handler
     def __call__(self):
-        controller.deploy()
-        print(f"Deploy project {controller.project_name} success.")
+        kai.deploy()
+        print(f"Deploy project {kai.project_name} success.")
 
 
 class KlonetCheckDeployedTool(Tool):
@@ -296,7 +284,7 @@ class KlonetCheckDeployedTool(Tool):
 
     @error_handler
     def __call__(self):
-        return controller.check_deployed()
+        return kai.check_deployed()
 
 
 class KlonetDestroyProjectTool(Tool):
@@ -316,7 +304,7 @@ class KlonetDestroyProjectTool(Tool):
 
     @error_handler
     def __call__(self):
-        controller.reset_project()
+        kai.reset_project()
         print("This project has been deleted.")
 
 
@@ -331,20 +319,62 @@ class KlonetCommandExecTool(Tool):
             commands can be separated by semicolons ';', and they will be executed sequentially.
 
     Returns: 
-        str: The output of command execution on nodes. 
+        None
     
     Example:
-        >>> output = klonet_command_exec("h1", "ls; pwd")
-        >>> print(output)
+        >>> klonet_command_exec("h1", "ls; pwd")
     ''')
 
     inputs = ["str", "str"]
-    outputs = ["str"]
 
     @error_handler
     def __call__(self, node_name: str, command: str):
-        response = controller.execute(node_name, command)
-        return response[node_name][command]['output'].strip()
+        response = kai.execute(node_name, command)
+        print(response[node_name][command]['output'].strip())
+
+
+class KlonetBatchCommandExecTool(Tool):
+    name = "klonet_batch_command_exec"
+    description = ('''
+    Execute the given command on batched nodes.
+    
+    Args:
+        node_list (list): A list of target nodes where the command will be executed.
+        node_type (str): The type of nodes, could be: "all", "specified_ctn_type", 
+            or "specified_ctn_list".
+            - When node_type is "all", the command is executed on all nodes, and 
+                node_list should be empty.
+            - When node_type is "specified_ctn_type", the nodes are selected by their
+                type, and the selected nodes should execute the command. The types 
+                include: "hosts", "controllers", "routers", and "switches". For example,
+                when node_list is ["hosts"], all host nodes should execute the command.
+            - When node_type is "specified_ctn_list", the nodes are selected by their
+                name, and the selected nodes should execute the command. For example, 
+                when node_list is ["h1", "s1"], the nodes h1 and s1 should execute the
+                command.
+        command (str): The command to be executed on the selected nodes. Multiple 
+            commands can be separated by semicolons ';', and they will be executed 
+            sequentially.
+    
+    Returns:
+        None
+        
+    Example:
+        # Case 1: Run a command on all nodes.
+        >>> klonet_batch_command_exec([], "all", "ifconfig")
+        # Case 2: Run a command on all host nodes.
+        >>> klonet_batch_command_exec(["hosts"], "specified_ctn_type", "ifconfig")
+        # Case 3: Run a command on the selected nodes.
+        >>> klonet_batch_command_exec(["h1", "s1"], "specified_ctn_list", "ifconfig")
+    ''')
+
+    inputs = ["list", "str", "str"]
+
+    @error_handler
+    def __call__(self, node_list: list, node_type: str, command: str):
+        ctns = {"list_type": node_type, "list": node_list}
+        result = kai.batch_exec(ctns, command)
+        print(result)
 
 
 class KlonetSSHServiceTool(Tool):
@@ -366,7 +396,7 @@ class KlonetSSHServiceTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str):
-        success = controller.enable_ssh_service(node_name)
+        success = kai.enable_ssh_service(node_name)
         print(f"SSH service on {node_name} started {'success' if success else 'failed'}.")
 
 
@@ -393,7 +423,7 @@ class KlonetPortMappingTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str, container_port: int, host_port: int):
-        success = controller.port_mapping(node_name, container_port, host_port)
+        success = kai.port_mapping(node_name, container_port, host_port)
         print(f"Port mapping on {node_name} {'success' if success else 'failed'}.")
 
 
@@ -416,7 +446,7 @@ class KlonetGetPortMappingTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str):
-        result = controller.get_port_mapping(node_name)
+        result = kai.get_port_mapping(node_name)
         print(f"Port map: {result['ne_port']}")
 
 
@@ -426,8 +456,8 @@ class KlonetGetIPTool(Tool):
     Retrieve the IP address of a Klonet node by its name. When you need 
     to communicate with a target host, use this tool to retrieve the 
     target IP address. For example, if h1 wants to ping h2, it should
-    call klonet_get_ip('h2') to retrieve its IP address (e.g., 10.0.0.1),
-    and then ping 10.0.0.1.
+    call klonet_get_ip('h2') to retrieve its IP address (e.g., 10.0.0.3),
+    and then ping 10.0.0.3.
     
     Args:
         node_name (str): The name of the Klonet node for which you want 
@@ -446,7 +476,7 @@ class KlonetGetIPTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str):
-        return controller.nodes[node_name].interfaces[0]['ip']
+        return kai.nodes[node_name].interfaces[0]['ip']
 
 
 class KlonetLinkConfigurationTool(Tool):
@@ -517,8 +547,8 @@ class KlonetLinkConfigurationTool(Tool):
             **({"queue_size_bytes": queue_size} if queue_size >= 0 else {}),
         }
         # Reset the link configuration before modifying it.
-        controller.reset_link(link_name, clean_cache=False)
-        merged_config = controller.configure_link(config)
+        kai.reset_link(link_name, clean_cache=False)
+        merged_config = kai.configure_link(config)
         print(f"Link {link_name} (on the {node_name} side) is configured "
               f"with: {merged_config}")
 
@@ -542,7 +572,7 @@ class KlonetResetLinkConfigurationTool(Tool):
 
     @error_handler
     def __call__(self, link_name: str):
-        controller.reset_link(link_name, clean_cache=True)
+        kai.reset_link(link_name, clean_cache=True)
         print(f"Link {link_name} has been reset.")
 
 
@@ -567,7 +597,7 @@ class KlonetLinkQueryTool(Tool):
 
     def __call__(self, link_name: str, node_name: str):
         # TODO: To be added.
-        return controller.query_link(link_name, node_name)
+        return kai.query_link(link_name, node_name)
 
 
 class KlonetGetWorkerIPTool(Tool):
@@ -592,5 +622,315 @@ class KlonetGetWorkerIPTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str = None):
-        result = controller.get_worker_id(node_name)
+        result = kai.get_worker_id(node_name)
         print(f"Worker IP: {result}")
+
+
+class KlonetTreeTopoTemplate(Tool):
+    name = "klonet_tree_topo_template"
+    description = ('''
+    Deploy a tree network topology on Klonet. Do not call the
+    klonet_deploy_network tool if you use this template.
+    
+    Args:
+        subnet (str): The subnet to deploy the topology.
+        ndepth (int, optional): The depth of the tree (default is 2).
+        nbranch (int, optional): The number of branches at each level 
+            (default is 2).
+        density (int, optional): The number of hosts connected to each 
+            leaf switch (default is 2).
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_tree_topo_template("192.168.1.0/24", ndepth=2, nbranch=2, density=1)
+    ''')
+
+    inputs = ["str", "int", "int", "int"]
+
+    @error_handler
+    def __call__(self, subnet: str, ndepth: int = 2, nbranch: int = 2, density: int = 1):
+        print("[Warning] This operation will overwrite the existing topology.")
+        kai.reset_project()
+        print("[Warning] Creating topology in this way will not layout the view.")
+        params_config = {
+            "topology_type": "tree",
+            "tree_depths": ndepth,
+            "tree_branches": nbranch,
+            "tree_host_density": density,
+            "host_counter": 1,
+            "switch_counter": 1,
+            "link_counter": 1,
+            "ip_prefix": subnet
+        }
+        net_config = kai.create_template_topo(params_config)
+        result = kai.deploy_from_config(net_config)
+        print(result)
+
+
+class KlonetStarTopoTemplate(Tool):
+    name = "klonet_star_topo_template"
+    description = ('''
+    Deploy a star network topology on Klonet. Do not call the
+    klonet_deploy_network tool if you use this template.
+    
+    Args:
+        subnet (str): The subnet to deploy the topology.
+        nstar (str, optional): The number of host nodes (default is 3).
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_star_topo_template("192.168.1.0/24", nstar=3)
+    ''')
+
+    inputs = ["str", "int"]
+
+    @error_handler
+    def __call__(self, subnet: str, nstar: int = 3):
+        print("[Warning] This operation will overwrite the existing topology.")
+        kai.reset_project()
+        print("[Warning] Creating topology in this way will not layout the view.")
+        params_config = {
+            "topology_type": "star",
+            "star_n": nstar,
+            "host_counter": 1,
+            "switch_counter": 1,
+            "link_counter": 1,
+            "ip_prefix": subnet
+        }
+        net_config = kai.create_template_topo(params_config)
+        result = kai.deploy_from_config(net_config)
+        print(result)
+
+
+class KlonetFatTreeTopoTemplate(Tool):
+    name = "klonet_fattree_topo_template"
+    description = ('''
+    Deploy a Fat-Tree network topology template on Klonet. Do not call the
+    klonet_deploy_network tool if you use this template.
+    
+    Args:
+        subnet (str): The subnet to deploy the topology.
+        npod (int, optional): The number of pods of the Fat-Tree (default is 4).
+    
+    Returns:
+        None
+        
+    Example:
+        >>> klonet_fattree_topo_template("192.168.1.0/24", npod=4)
+    ''')
+
+    inputs = ["str", "int"]
+
+    @error_handler
+    def __call__(self, subnet: str, npod: int = 4):
+        print("[Warning] This operation will overwrite the existing topology.")
+        kai.reset_project()
+        print("[Warning] Creating topology in this way will not layout the view.")
+        params_config = {
+            "topology_type": "fattree",
+            "fattree_k": npod,
+            "host_counter": 1,
+            "switch_counter": 1,
+            "link_counter": 1,
+            "ip_prefix": subnet
+        }
+        net_config = kai.create_template_topo(params_config)
+        result = kai.deploy_from_config(net_config)
+        print(result)
+
+
+class KlonetLinearTopoTemplate(Tool):
+    name = "klonet_linear_topo_template"
+    description = ('''
+    Deploy a linear network topology template on Klonet. Do not call the
+    klonet_deploy_network tool if you use this template.
+    
+    Args:
+        subnet (str): The subnet to deploy the topology.
+        nswitch (int, optional): The number of switches (default is 3).
+        nnodes (int, optional): The number of host nodes on each side of 
+            the switches (default is 2).
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_linear_topo_template("192.168.1.0/24", nswitch=3, nnodes=2)
+    ''')
+
+    inputs = ["str"]
+
+    @error_handler
+    def __call__(self, subset: str, nswitch: int = 3, nnodes: int = 2):
+        print("[Warning] This operation will overwrite the existing topology.")
+        kai.reset_project()
+        print("[Warning] Creating topology in this way will not layout the view.")
+        params_config = {
+            "topology_type": "linear",
+            "linear_m": nswitch,
+            "linear_n": nnodes,
+            "host_counter": 1,
+            "switch_counter": 1,
+            "link_counter": 1,
+            "ip_prefix": subset
+        }
+        net_config = kai.create_template_topo(params_config)
+        result = kai.deploy_from_config(net_config)
+        print(result)
+
+
+class KlonetConfigurePublicNetworkTool(Tool):
+    name = "klonet_configure_public_network"
+    description = ('''
+    Use this tool to enable external network access for containers. It connects 
+    containers to the Internet via the docker0 bridge, utilizing the eth0 network 
+    interface.
+    
+    Args:
+        node_name (str): The name of the node.
+        turn_on (bool, optional): True for enabling public network access and False
+            for disconnecting this node from the Internet (default is True).
+    
+    Returns:
+        None
+    
+    Example:
+        # To connect h1 to the Internet, use:
+        >>> klonet_configure_public_network('h1', turn_on=True)
+        # To disconnect h1 from the Internet, use:
+        >>> klonet_configure_public_network('h1', turn_on=False)
+    ''')
+
+    inputs = ["str", "bool"]
+
+    @error_handler
+    def __call__(self, node_name: str, turn_on: bool = True):
+        result = kai.config_public_network(node_name, turn_on)
+        print(result)
+
+
+class KlonetCheckPublicNetworkTool(Tool):
+    name = "klonet_check_public_network"
+    description = ('''
+    Check if a given node has access to the Internet.
+    
+    Args:
+        node_name (str): The name of the node.
+    
+    Returns:
+        None
+    
+    Example:
+        >>> result = klonet_check_public_network('h1')
+        >>> print(result)  # 1 means connected and 0 means disconnected.
+    ''')
+
+    inputs = ["str"]
+
+    @error_handler
+    def __call__(self, node_name: str):
+        result = kai.check_public_network(node_name)
+        print(result)
+
+
+class KlonetFileDownloadTool(Tool):
+    name = "klonet_file_download"
+    description = ('''
+    Download file from Klonet nodes. 
+    
+    Args:
+        node_name (str): The name of the node to download from.
+        file_name (str): The path of the file to download.
+    
+    Returns:
+        None
+    ''')
+
+    inputs = ["str", "str"]
+
+    @error_handler
+    def __call__(self, node_name: str, file_name: str):
+        print("KlonetAI does not support file download. Please use "
+              "Klonet WebUI to download files manually.")
+
+
+class KlonetFileUploadTool(Tool):
+    name = "klonet_file_upload"
+    description = ('''
+    Upload a file to a given node.
+    
+    Args:
+        node_name (str): The name of the target container node.
+        src_filepath (str): The path to the source file to be uploaded.
+        tgt_filepath (str, optional): The path on the target node where 
+            the file will be stored (default is '/home').
+    
+    Returns:
+        None
+    
+    Example:
+        # Upload the local main.py to the path /home within the container h1.
+        >>> klonet_file_upload("/PathTo/main.py", "h1", "/home")
+    ''')
+
+    inputs = ["str", "str", "str"]
+
+    @error_handler
+    def __call__(self, src_filepath: str, node_name: str, tgt_filepath: str = "/home"):
+        result = kai.upload_file(node_name, src_filepath, tgt_filepath)
+        print(result)
+
+
+class KlonetManageWorkerTool(Tool):
+    name = "klonet_manage_worker"
+    description = ('''
+    Register or unregister a physical host machine.
+    
+    Args:
+        worker_ip (str): The IP address of the physical host machine to be 
+            registered or unregistered.
+        delete_worker (bool, optional): If True, the specified physical host 
+            machine will be unregistered. Otherwise, it will be registered
+            (default is False).
+    
+    Returns:
+        None
+    
+    Example:
+        # Register a new physical host machine of IP 10.1.1.16 to Klonet system.
+        >>> klonet_manage_worker("10.1.1.16", delete_worker=False)
+        # Unregister the physical host machine of IP 10.1.1.16 from Klonet system.
+        >>> klonet_manage_worker("10.1.1.16", delete_worker=True)
+    ''')
+
+    inputs = ["str", "bool"]
+
+    @error_handler
+    def __call__(self, worker_ip: str, delete_worker: bool = False):
+        result = kai.manage_worker(worker_ip, delete_worker)
+        print(result)
+
+
+class KlonetCheckHealthTool(Tool):
+    name = "klonet_check_health"
+    description = ('''
+    Check the heartbeat health status of all nodes.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    
+    Example:
+        >>> klonet_check_health()
+    ''')
+
+    @error_handler
+    def __call__(self):
+        is_broken, broken_nodes = kai.check_health()
+        print(f"[{'Broken' if is_broken else 'Health'}]", broken_nodes)

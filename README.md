@@ -35,10 +35,13 @@ kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-1
 # Use the Huggingface StarCoder model (for free).
 # kai.create_agent(agent_name="starcoder", tools=tools)
 
-# Use a customized LLM model, could be "chatglm_pro", "chatglm_std", or "chatglm_lite" (not for free).
-# from agent import ChatGLMAgent
-# custom_agent = ChatGLMAgent("chatglm_std", additional_tools=tools)
-# kai.create_agent(agent=custom_agent, tools=tools)
+# Use a customized LLM model.
+# For ChatGML, the model could be "chatglm_pro", "chatglm_std", "chatglm_lite", or "chatglm_lite_32k".
+# For ErnieBot, the model could be "ernie-bot" or "ernie-bot-turbo".
+# from agent import ChatGLMAgent, ErnieBotAgent
+# custom_agent = ChatGLMAgent("chatglm_lite_32k", additional_tools=tools)
+# custom_agent = ErnieBotAgent("ernie-bot-turbo", additional_tools=tools)
+# kai.create_agent(agent=custom_agent)
 ```
 
 Next, we can use <code>agent</code> to interact with KlonetAI. For example:

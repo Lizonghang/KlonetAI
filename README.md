@@ -10,35 +10,35 @@ is used for, as below.
 ```python
 import tool
 import tutorial
-from transformers.tools import OpenAiAgent
-from key import OpenAI_API_Key
-from tool.klonet import controller
+from tool.klonet import kai
 
-# Collect our tools.
-klonetai_tools =  [obj() for obj in tool.base]
-klonetai_tools += [obj() for obj in tool.klonet]
-# klonetai_tools += [obj() for obj in tool.gpt]  # note: these are not free.
-klonetai_tools += [obj() for obj in tutorial.base]
-
-# Instantiate the Agent with our KlonetAI tools.
-agent = OpenAiAgent(
-    model="gpt-3.5-turbo-16k", 
-    api_key=OpenAI_API_Key, 
-    additional_tools=klonetai_tools
-)
-
-# Replace the default summarizer with our GPT summarizer.
-agent.toolbox["summarizer"] = tool.SummarizeTool()
-
-# List all tools we have.
-print(agent.toolbox.keys())
-
-# Log in Klonet backend.
+# For Klonet backend.
 project_name = "klonetai"  # Replace it with your own project name.
 user_name = "<Registered-Username>"  # Replace it with your own user name.
 host_ip = "<Host-IP>"  # Replace it with Klonet backend IP.
 port = <Port>  # Replace it with Klonet backend port number.
-controller.login(project_name, user_name, host_ip, port)
+
+# Collect the tools you need.
+tools = [obj() for obj in tool.base]
+tools += [obj() for obj in tool.klonet]
+tools += [obj() for obj in tool.topo]
+tools += [obj() for obj in tool.gpt]
+tools += [obj() for obj in tutorial.base]
+
+# Login to Klonet backend.
+kai.klonet_login(project_name, user_name, host_ip, port)
+
+# Create a KlonetAI agent.
+# Use the OpenAI GPT model, could also be "gpt-3.5-turbo" and "gpt-4" (not for free but recommended).
+kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-16k")
+
+# Use the Huggingface StarCoder model (for free).
+# kai.create_agent(agent_name="starcoder", tools=tools)
+
+# Use a customized LLM model, could be "chatglm_pro", "chatglm_std", or "chatglm_lite" (not for free).
+# from agent import ChatGLMAgent
+# custom_agent = ChatGLMAgent("chatglm_std", additional_tools=tools)
+# kai.create_agent(agent=custom_agent, tools=tools)
 ```
 
 Next, we can use <code>agent</code> to interact with KlonetAI. For example:
@@ -48,7 +48,7 @@ Next, we can use <code>agent</code> to interact with KlonetAI. For example:
 #### Check the image list
 
 ```python
->>> agent.chat("List all available images.")
+>>> kai.chat("List all available images.")
 ```
 ```text
 Outputs:
@@ -77,7 +77,7 @@ ovs
 #### Create a network with star topology
 
 ```python
->>> agent.chat("Create a star network with 5 host nodes and 1 ovs switch, and deploy it. "
+>>> kai.chat("Create a star network with 5 host nodes and 1 ovs switch, and deploy it. "
 "Set node positions and link IPs to form a star shape.")
 ```
 ```text
@@ -128,7 +128,7 @@ Deploy project klonetai success.
 ```
 
 ```python
->>> agent.chat("Show the network.")
+>>> kai.chat("Show the network.")
 ```
 ```text
 Outputs:
@@ -154,7 +154,7 @@ Links: {'l1': ('h1', 's1'), 'l2': ('h2', 's1'), 'l3': ('h3', 's1'), 'l4': ('h4',
 
 ```python
 # Now, let us execute some commands in these hosts:
->>> agent.chat("All host nodes ping h1.")
+>>> kai.chat("All host nodes ping h1.")
 ```
 ```text
 Outputs:
@@ -213,7 +213,7 @@ rtt min/avg/max/mdev = 0.057/0.318/0.809/0.347 ms
 #### Link Configuration
 
 ```python
-agent.chat("Set the bandwidth and the delay between h1 and s1 to 5mbps and 10us, respectively.")
+kai.chat("Set the bandwidth and the delay between h1 and s1 to 5mbps and 10us, respectively.")
 ```
 ```text
 Outputs:
@@ -232,7 +232,7 @@ Link l1 (on the h1 side) is configured with: {'link': 'l1', 'ne': 'h1', 'bw_kbps
 ```
 
 ```python
->>> agent.chat("Start iperf server on h2 and measure the bandwidth between h1 and h2.")
+>>> kai.chat("Start iperf server on h2 and measure the bandwidth between h1 and h2.")
 ```
 ```text
 Outputs:
@@ -261,7 +261,7 @@ TCP window size: 85.0 KByte (default)
 ```
 
 ```python
->>> agent.chat("Reset link l1.")
+>>> kai.chat("Reset link l1.")
 ```
 ```text
 Outputs:
@@ -279,7 +279,7 @@ Link l1 has been reset.
 ```
 
 ```python
->>> agent.chat("Start iperf server on h2 and measure the bandwidth between h1 and h2.")
+>>> kai.chat("Start iperf server on h2 and measure the bandwidth between h1 and h2.")
 ```
 ```text
 Outputs:
@@ -310,7 +310,7 @@ TCP window size: 85.0 KByte (default)
 #### SSH Service
 
 ```python
->>> agent.chat("Start ssh service on all host nodes.")
+>>> kai.chat("Start ssh service on all host nodes.")
 ```
 ```text
 Outputs:
@@ -345,7 +345,7 @@ Now, we can enter these host nodes through SSH.
 #### Port Mapping
 
 ```python
->>> agent.chat("Export port 5678 of all host nodes to the host machine, start by port 9200.")
+>>> kai.chat("Export port 5678 of all host nodes to the host machine, start by port 9200.")
 ```
 ```text
 Outputs:
@@ -373,7 +373,7 @@ Port mapping on h5 success.
 Now, let us check the port map of h1:
 
 ```python
->>> agent.chat("Show the port map of h1.")
+>>> kai.chat("Show the port map of h1.")
 ```
 ```text
 Outputs:
@@ -393,7 +393,7 @@ Port map: {'5678': [9200]}
 #### Query the IP address
 
 ```python
->>> agent.chat("What is the IP of h1?")
+>>> kai.chat("What is the IP of h1?")
 ```
 ```text
 Outputs:
@@ -414,7 +414,7 @@ The IP address of h1 is 10.0.0.2.
 #### Query the host machine IPs of given nodes
 
 ```python
->>> agent.chat("Which host machine is h1 deployed on?")
+>>> kai.chat("Which host machine is h1 deployed on?")
 ```
 ```text
 Outputs:
@@ -432,7 +432,7 @@ Worker IP: {'h1': '192.168.1.16'}
 ```
 
 ```python
->>> agent.chat("Where are the nodes deployed on?")
+>>> kai.chat("Where are the nodes deployed on?")
 ```
 ```text
 Outputs:
@@ -452,7 +452,7 @@ Worker IP: {'h1': '192.168.1.16', 'h2': '192.168.1.16', 'h3': '192.168.1.16', 'h
 #### Traffic injection
 
 ```python
->>> agent.chat("Use iperf on all hosts to inject traffic to h1. Launch them asynchronously by running them at the background.")
+>>> kai.chat("Use iperf on all hosts to inject traffic to h1. Launch them asynchronously by running them at the background.")
 ```
 ```text
 Outputs:
@@ -486,7 +486,7 @@ TCP window size: 85.0 KByte (default)
 #### Delete this network
 
 ```python
->>> agent.run("Delete project.")
+>>> kai.run("Delete project.")
 ```
 ```text
 Outputs:
@@ -508,7 +508,7 @@ This project has been deleted.
 
 ### Case 1: Create a Star Topology and Launch MXNET Distributed Training
 ```python
->>> agent.chat("Create a star network with 6 nodes and 1 ovs, " 
+>>> kai.chat("Create a star network with 6 nodes and 1 ovs, " 
 "deploy 1 MXNET scheduler, 2 MXNET server, and 3 MXNET workers on these " 
 "nodes, and run MXNET jobs. The scheduler is launched on IP 192.168.1.22. " 
 "Do not use ListComp and BinOp, write the codes line by line instead.")
@@ -596,7 +596,7 @@ Feedback from node6 after calling DMLC_ROLE=worker DMLC_PS_ROOT_URI=192.168.1.22
 ### Case 2: Read Online Tutorials to Launch Klonet and Upper-Level Apps
 
 ```python
->>> doc = agent.run("Summarize how to manually launch MXNET jobs from "
+>>> doc = kai.run("Summarize how to manually launch MXNET jobs from "
 "https://mxnet.apache.org/versions/1.9.1/api/faq/distributed_training")
 print(len(doc))
 ```
@@ -633,7 +633,7 @@ Note that starting all jobs on the same machine is not recommended for productio
 ```
 
 ```python
->>> agent.run(f'''
+>>> kai.run(f'''
 === Tutorials ===
 {doc}
 

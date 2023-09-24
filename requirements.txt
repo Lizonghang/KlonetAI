@@ -8,3 +8,4 @@ Pillow==10.0.0
 sentencepiece==0.1.99
 requests==2.31.0
 zhipuai==1.0.7
+erniebot==0.3.1

@@ -48,9 +48,10 @@ class KlonetAddNodeTool(Tool):
     other nodes.
     
     Args:
-        name (str): The name of the node being added. The name of this 
-            new node cannot be the same as existing nodes.
-        image (str): The name of Docker image used by the node.
+        name (str): The name of the node being added. The name of this new node cannot be 
+            the same as existing nodes.
+        image (str): The name of Docker image used by the node. Use the klonet_get_all_images
+            tool to see the available images.
         x (int): The x-coordinate of the node on the canvas. It should be set as an integer 
             value between 0 and 700. The agent should set this for pretty visual layout.
         y (int): The y-coordinate of the node on the canvas. It should be set as an integer 
@@ -67,7 +68,10 @@ class KlonetAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
 
     Example:
+        # Add a ubuntu host named h1.
         >>> klonet_add_node("h1", "ubuntu", x=500, y=500)
+        # Add an OVS switch named s1.
+        >>> klonet_add_node("s1", "ovs", x=500, y=500)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]
@@ -89,9 +93,10 @@ class KlonetRuntimeAddNodeTool(Tool):
     (x, y) cannot overlap with other nodes.
     
     Args:
-        name (str): The name of the node being added. Be sure not 
-            to use the same name as existing nodes.
-        image (str): The name of Docker image used by the node.
+        name (str): The name of the node being added. Be sure not to use the same name as 
+            existing nodes.
+        image (str): The name of Docker image used by the node. Use the klonet_get_all_images
+            tool to see the available images.
         x (int): The x-coordinate of the node on the canvas. It should be set as an integer 
             value between 0 and 700. The agent should set this for pretty visual layout.
         y (int): The y-coordinate of the node on the canvas. It should be set as an integer 
@@ -108,7 +113,10 @@ class KlonetRuntimeAddNodeTool(Tool):
         NodeDuplicatesError: Raised when the provided node name is a duplicate.
     
     Example:
-        >>> klonet_runtime_add_node("h3", "ubuntu", x=500, y=500)
+        # Add a ubuntu host named h2.
+        >>> klonet_runtime_add_node("h2", "ubuntu", x=500, y=500)
+        # Add an OVS switch named s1.
+        >>> klonet_runtime_add_node("s2", "ovs", x=500, y=500)
     ''')
 
     inputs = ["str", "str", "int", "int", "int", "int"]

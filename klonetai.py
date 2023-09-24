@@ -118,7 +118,6 @@ class KlonetAI:
         return http_response_handler(response, get_link_info)
 
     def klonet_login(self, project_name, user_name, host_ip, port):
-        print("Connecting to Klonet backend ...")
         self._project = project_name
         self._user = user_name
         self._backend_host = host_ip

@@ -6,3 +6,6 @@ ZhiPuAI_API_Key = "<Your-ZhiPuAI-API-Key>"
 
 # Apply on Hugging Face: https://huggingface.co/docs/hub/spaces-sdks-docker-argilla#set-up-passwords-and-api-keys-using-secrets-optional
 Huggingface_API_Key = "<Your-Huggingface-API-Key>"
+
+# Apply on Baidu AI Studio: https://aistudio.baidu.com/usercenter/token
+AI_Studio_APT_Key = "<Your-AIStudio-API-Key>"

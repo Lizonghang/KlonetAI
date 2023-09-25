@@ -48,7 +48,7 @@ class ChatGLMAgent(Agent):
         )
 
         if response["code"] != 200:
-            raise ValueError(f"Error {response.status_code}: {response.json()}")
+            raise ValueError(f"Error {response.status_code}: {response}")
 
         result = response["data"]["choices"][0]["content"]\
             .strip('"').replace('\\n', '\n').replace('\\"', '\"')

@@ -32,7 +32,8 @@ kai.klonet_login(project_name, user_name, host_ip, port)
 # Use the OpenAI GPT model, could also be "gpt-3.5-turbo" and "gpt-4" (not for free but recommended).
 kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-16k")
 
-# Use the Huggingface StarCoder model (for free).
+# Use the 🤗 model, could be "starcoder", "codellama-13b-hf" (4k), "falcon-7b", "codeLlama-34b-instruct-hf" (4k),
+# "phind-codellama-34b-v2" (for free).
 # kai.create_agent(agent_name="starcoder", tools=tools)
 
 # Use a customized LLM model.

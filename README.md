@@ -38,9 +38,13 @@ kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-1
 # Use a customized LLM model.
 # For ChatGML, the model could be "chatglm_pro", "chatglm_std", "chatglm_lite", or "chatglm_lite_32k".
 # For ErnieBot, the model could be "ernie-bot" or "ernie-bot-turbo".
-# from agent import ChatGLMAgent, ErnieBotAgent
+# For DashScope, the model could be "qwen-turbo", "qwen-plus".
+# For SparkDesk, we force to use spark v2.
+# from agent import ChatGLMAgent, ErnieBotAgent, DashScopeAgent, SparkDesk
 # custom_agent = ChatGLMAgent("chatglm_lite_32k", additional_tools=tools)
 # custom_agent = ErnieBotAgent("ernie-bot-turbo", additional_tools=tools)
+# custom_agent = DashScopeAgent("qwen-turbo", additional_tools=tools)
+# custom_agent = SparkDesk(additional_tools=tools)
 # kai.create_agent(agent=custom_agent)
 ```
 

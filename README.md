@@ -37,8 +37,8 @@ kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-1
 
 # ============ Use 🤗 models for free ! ============
 # Replace `Huggingface_API_Key` in key.py with your own.
-# The agent name could be "starcoder" (recommended), "codellama-13b-hf" (4k), "falcon-7b", 
-# "codeLlama-34b-instruct-hf" (4k), or "phind-codellama-34b-v2".
+# The agent name could be "starcoder" (recommended), "codellama-13b-hf" (4k), "codeLlama-34b-instruct-hf" (4k), 
+# or "phind-codellama-34b-v2".
 # kai.create_agent(agent_name="starcoder", tools=tools)
 
 # ======== Use customized cloud LLM service ========

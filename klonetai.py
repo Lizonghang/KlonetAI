@@ -147,7 +147,6 @@ class KlonetAI:
                 "codellama-13b-hf": "codellama/CodeLlama-13b-hf",
                 "codeLlama-34b-instruct-hf": "codellama/CodeLlama-34b-Instruct-hf",
                 "phind-codellama-34b-v2": "Phind/Phind-CodeLlama-34B-v2",
-                "falcon-7b": "tiiuae/falcon-7b",
             }
             model_suffix = pinned_model.get(agent_name, "bigcode/starcoder")
             url = f"https://api-inference.huggingface.co/models/{model_suffix}"

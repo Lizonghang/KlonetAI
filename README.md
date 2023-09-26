@@ -29,24 +29,41 @@ tools += [obj() for obj in tutorial.base]
 kai.klonet_login(project_name, user_name, host_ip, port)
 
 # Create a KlonetAI agent.
-# Use the OpenAI GPT model, could also be "gpt-3.5-turbo" and "gpt-4" (not for free but recommended).
+
+# ============ Use OpenAI ChatGPT model ============
+# Replace `OpenAI_API_Key` in key.py with your own.
+# The model name could be "gpt-3.5-turbo", "gpt-3.5-turbo-16k", and "gpt-4".
 kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-16k")
 
-# Use the 🤗 model, could be "starcoder", "codellama-13b-hf" (4k), "falcon-7b", "codeLlama-34b-instruct-hf" (4k),
-# "phind-codellama-34b-v2" (for free).
+# ============ Use 🤗 models for free ! ============
+# Replace `Huggingface_API_Key` in key.py with your own.
+# The agent name could be "starcoder" (recommended), "codellama-13b-hf" (4k), "falcon-7b", 
+# "codeLlama-34b-instruct-hf" (4k), or "phind-codellama-34b-v2".
 # kai.create_agent(agent_name="starcoder", tools=tools)
 
-# Use a customized LLM model.
-# For ChatGML, the model could be "chatglm_pro", "chatglm_std", "chatglm_lite", or "chatglm_lite_32k".
-# For ErnieBot, the model could be "ernie-bot" or "ernie-bot-turbo".
-# For DashScope, the model could be "qwen-turbo", "qwen-plus".
-# For SparkDesk, we force to use spark v2.
+# ======== Use customized cloud LLM service ========
 # from agent import ChatGLMAgent, ErnieBotAgent, DashScopeAgent, SparkDesk
+
+# Replace `ZhiPuAI_API_Key` in key.py with your own.
+# The model name could be "chatglm_pro", "chatglm_std", "chatglm_lite", or "chatglm_lite_32k".
 # custom_agent = ChatGLMAgent("chatglm_lite_32k", additional_tools=tools)
+
+# Replace `AI_Studio_APT_Key` in key.py with your own.
+# The model name could be "ernie-bot" or "ernie-bot-turbo".
 # custom_agent = ErnieBotAgent("ernie-bot-turbo", additional_tools=tools)
+
+# Replace `DashScope_API_Key` in key.py with your own.
+# The model name could be "qwen-turbo", "qwen-plus".
 # custom_agent = DashScopeAgent("qwen-turbo", additional_tools=tools)
+
+# Replace `SparkDesk_AppId`, `SparkDesk_API_Secret`, `SparkDesk_API_Key` in key.py with your own.
+# The model is forced to spark v2.
 # custom_agent = SparkDesk(additional_tools=tools)
+
 # kai.create_agent(agent=custom_agent)
+
+# ========== Use customized local model ===========
+# Coming soon !
 ```
 
 Next, we can use <code>agent</code> to interact with KlonetAI. For example:

@@ -273,8 +273,22 @@ class KlonetAI:
         if clean_cache: self._link_config.clear()
 
     def query_link(self, link_name, node_name):
-        # TODO: To be added.
-        return None
+        ip = self._backend_host
+        port = self._port
+        url = f"http://{ip}:{port}/master/linkquery/"
+        data = {
+            "user": self._user,
+            "topo": self._project,
+            "links": [{
+                "link": link_name,
+                "ne": node_name
+            }]
+        }
+        response = requests.post(url, json=data)
+
+        def get_link_info(data_json):
+            return data_json["static"]
+        return http_response_handler(response, get_link_info)
 
     def deploy(self):
         self._project_manager.deploy(self._project, self._topo)
@@ -344,7 +358,7 @@ class KlonetAI:
         return http_response_handler(response, get_topo_config)
 
     def config_public_network(self, node_name, turn_on=True):
-        url = f"http://{self._backend_host}:{self._port}/node/network"
+        url = f"http://{self._backend_host}:{self._port}/master/node/network/"
         data = {
             "user": self._user,
             "topo": self._project,
@@ -359,7 +373,7 @@ class KlonetAI:
         port = self._port
         user = self._user
         project = self._project
-        url = f"http://{ip}:{port}/node/network/?user={user}&topo={project}&ne={node_name}"
+        url = f"http://{ip}:{port}/master/node/network/?user={user}&topo={project}&ne={node_name}"
         response = requests.get(url)
 
         def get_status(data_json):
@@ -373,9 +387,9 @@ class KlonetAI:
             "topo": self._project,
             "ne_name": node_name,
             "file_path": tgt_filepath,
-            "file": open(src_filepath, "rb")
         }
-        response = requests.post(url, data=data)
+        files = {"file": open(src_filepath, "rb")}
+        response = requests.post(url, data=data, files=files)
         return http_response_handler(response)
 
     def manage_worker(self, worker_ip, delete_worker=False):

@@ -604,7 +604,6 @@ class KlonetLinkQueryTool(Tool):
     outputs = ["dict"]
 
     def __call__(self, link_name: str, node_name: str):
-        # TODO: To be added.
         return kai.query_link(link_name, node_name)
 
 
@@ -833,8 +832,8 @@ class KlonetCheckPublicNetworkTool(Tool):
         None
     
     Example:
-        >>> result = klonet_check_public_network('h1')
-        >>> print(result)  # 1 means connected and 0 means disconnected.
+        # 1 means connected and 0 means disconnected.
+        >>> klonet_check_public_network('h1')
     ''')
 
     inputs = ["str"]

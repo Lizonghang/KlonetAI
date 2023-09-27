@@ -209,7 +209,6 @@ class KlonetAI:
         return self._agent.run(*args, **kwargs)
 
     def reset_project(self):
-        del self._topo
         self._topo = Topo()
         self._link_config.clear()
         self._project_manager.destroy(self._project)
@@ -339,7 +338,7 @@ class KlonetAI:
         return self._node_manager.get_node_worker_ip(node_name)
 
     def deploy_from_config(self, config):
-        del self._topo; self._topo = Topo(**config)
+        self._topo = Topo(**config)
         url = f"http://{self._backend_host}:{self._port}/master/topo/"
         data = {
             "user": self._user,

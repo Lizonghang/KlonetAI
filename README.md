@@ -7,6 +7,8 @@ This repo provides an AI agent for intelligent interaction with the
 Klonet platform. Some examples are provided to show what this repo 
 is used for, as below.
 
+**NOTE: You may need a VPN service to access 🤗.**
+
 ```python
 import tool
 import tutorial

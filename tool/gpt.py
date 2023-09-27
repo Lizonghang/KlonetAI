@@ -36,7 +36,7 @@ class SummarizeTool(Tool):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo-16k",
             messages=[{
-                "role": "system",
+                "role": "user",
                 "content": qa_template.substitute(
                     context=context,
                     query=query

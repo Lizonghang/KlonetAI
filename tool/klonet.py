@@ -727,7 +727,7 @@ class KlonetFatTreeTopoTemplate(Tool):
         None
         
     Example:
-        >>> klonet_fattree_topo_template("192.168.1.0/24", npod=4)
+        >>> klonet_fattree_topo_template("192.168.1.0/24", npod=2)
     ''')
 
     inputs = ["str", "int"]

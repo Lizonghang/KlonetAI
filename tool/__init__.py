@@ -60,14 +60,14 @@ klonet = (
     KlonetGetIPTool,
     KlonetLinkConfigurationTool,
     KlonetResetLinkConfigurationTool,
-    KlonetLinkQueryTool,  # TODO: To be added.
+    KlonetLinkQueryTool,
     KlonetGetWorkerIPTool,
-    KlonetConfigurePublicNetworkTool,  # TODO: To be debug.
-    KlonetCheckPublicNetworkTool,  # TODO: To be debug.
+    KlonetConfigurePublicNetworkTool,
+    KlonetCheckPublicNetworkTool,
     KlonetFileDownloadTool,
-    KlonetFileUploadTool,  # TODO: To be test.
+    KlonetFileUploadTool,
     KlonetManageWorkerTool,  # TODO: To be test.
-    KlonetCheckHealthTool,  # TODO: To be test.
+    KlonetCheckHealthTool,
 )
 
 topo = (

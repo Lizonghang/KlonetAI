@@ -42,23 +42,26 @@ kai.create_agent(agent_name="openai", tools=tools, openai_model="gpt-3.5-turbo-1
 # kai.create_agent(agent_name="starcoder", tools=tools)
 
 # ======== Use customized cloud LLM service ========
-# from agent import ChatGLMAgent, ErnieBotAgent, DashScopeAgent, SparkDesk
 # prompt = "LIKirin/klonetai-prompts"
 
 # Replace `ZhiPuAI_API_Key` in key.py with your own.
 # The model name could be "chatglm_pro", "chatglm_std", "chatglm_lite", or "chatglm_lite_32k".
+# from agent.chatglm import ChatGLMAgent
 # custom_agent = ChatGLMAgent("chatglm_lite_32k", chat_prompt_template=prompt, run_prompt_template=prompt, additional_tools=tools)
 
 # Replace `AI_Studio_APT_Key` in key.py with your own.
 # The model name could be "ernie-bot" or "ernie-bot-turbo".
+# from agent.erniebot import ErnieBotAgent
 # custom_agent = ErnieBotAgent("ernie-bot-turbo", chat_prompt_template=prompt, run_prompt_template=prompt, additional_tools=tools)
 
 # Replace `DashScope_API_Key` in key.py with your own.
 # The model name could be "qwen-turbo", "qwen-plus".
+# from agent.dashscope import DashScopeAgent
 # custom_agent = DashScopeAgent("qwen-turbo", chat_prompt_template=prompt, run_prompt_template=prompt, additional_tools=tools)
 
 # Replace `SparkDesk_AppId`, `SparkDesk_API_Secret`, `SparkDesk_API_Key` in key.py with your own.
 # The model is forced to spark v2.
+# from agent.sparkdesk import SparkDesk
 # custom_agent = SparkDesk(chat_prompt_template=prompt, run_prompt_template=prompt, additional_tools=tools)
 
 # kai.create_agent(agent=custom_agent)

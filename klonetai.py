@@ -137,7 +137,12 @@ class KlonetAI:
             from transformers.tools import OpenAiAgent
             from key import OpenAI_API_Key
             self._agent = OpenAiAgent(
-                model=openai_model, api_key=OpenAI_API_Key, additional_tools=tools)
+                model=openai_model,
+                api_key=OpenAI_API_Key,
+                chat_prompt_template="LIKirin/klonetai-prompts",
+                run_prompt_template="LIKirin/klonetai-prompts",
+                additional_tools=tools
+            )
             print("Connected to OpenAI Agent.")
         else:
             from transformers.tools import HfAgent
@@ -150,7 +155,13 @@ class KlonetAI:
             }
             model_suffix = pinned_model.get(agent_name, "bigcode/starcoder")
             url = f"https://api-inference.huggingface.co/models/{model_suffix}"
-            self._agent = HfAgent(url, token=Huggingface_API_Key, additional_tools=tools)
+            self._agent = HfAgent(
+                url,
+                token=Huggingface_API_Key,
+                chat_prompt_template="LIKirin/klonetai-prompts",
+                run_prompt_template="LIKirin/klonetai-prompts",
+                additional_tools=tools
+            )
             print(f"Connected to 🤗 Agent: {model_suffix}.")
 
         # Remove unnecessary built-in tools.

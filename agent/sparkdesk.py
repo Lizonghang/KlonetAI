@@ -9,8 +9,9 @@ from urllib.parse import urlencode, urlparse
 from datetime import datetime
 from time import mktime
 from wsgiref.handlers import format_date_time
-from key import SparkDesk_AppId, SparkDesk_API_Secret, SparkDesk_API_Key
+from key import SparkDesk_AppId, SparkDesk_AppSecret, SparkDesk_API_Key
 from transformers.tools import Agent
+from transformers.tools.prompts import CHAT_MESSAGE_PROMPT
 
 websocket.enableTrace(False)
 result = ""
@@ -114,6 +115,9 @@ class SparkDesk(Agent):
     Agent that uses Xunfei SparkDesk REST API to generate code.
 
     Args:
+        key (`str`, *optional*): The API key obtained from Xunfei SparkDesk Dashboard.
+        appid (`str`, *optional*): The App Id obtained from Xunfei SparkDesk Dashboard.
+        appsecret (`str`, *optional*): The App Secret obtained from Xunfei SparkDesk Dashboard.
         chat_prompt_template (`str`, *optional*):
             Pass along your own prompt if you want to override the default template for the `chat` method. Can be the
             actual prompt template or a repo ID (on the Hugging Face Hub). The prompt should be in a file named
@@ -134,13 +138,25 @@ class SparkDesk(Agent):
     ```
     """
 
-    def __init__(self, chat_prompt_template=None, run_prompt_template=None, additional_tools=None):
+    def __init__(self, key="", appid="", appsecret="", chat_prompt_template=None,
+                 run_prompt_template=None, additional_tools=None):
         super().__init__(
             chat_prompt_template=chat_prompt_template,
             run_prompt_template=run_prompt_template,
             additional_tools=additional_tools,
         )
         self.model_name = "spark-v2"
+        if key: SparkDesk_API_Key = key
+        if appid: SparkDesk_AppId = appid
+        if appsecret: SparkDesk_AppSecret = appsecret
+        self._mode = "agent"
+
+    @property
+    def mode(self):
+        return self._mode
+
+    def set_mode(self, mode):
+        self._mode = mode
 
     def generate_one(self, prompt, stop):
         global result
@@ -149,7 +165,7 @@ class SparkDesk(Agent):
         wsParam = Ws_Param(
             APPID=SparkDesk_AppId,
             APIKey=SparkDesk_API_Key,
-            APISecret=SparkDesk_API_Secret,
+            APISecret=SparkDesk_AppSecret,
             Spark_URL="ws://spark-api.xf-yun.com/v2.1/chat"
         )
         ws = websocket.WebSocketApp(
@@ -167,3 +183,17 @@ class SparkDesk(Agent):
             if result.endswith(stop_seq):
                 return result[: -len(stop_seq)]
         return result
+
+    def chat(self, task, *, return_code=False, remote=False, **kwargs):
+        if not self._mode == "chat":
+            return super().chat(task, return_code=return_code, remote=remote, **kwargs)
+
+        if self.chat_history is None:
+            description = "\n".join([f"- {name}: {tool.description}" for name, tool in self.toolbox.items()])
+            prompt = self.chat_prompt_template.replace("<<all_tools>>", description)
+        else:
+            prompt = self.chat_history
+        prompt += CHAT_MESSAGE_PROMPT.replace("<<task>>", f"[Chat only] {task}")
+        response = self.generate_one(prompt, stop=["Human:", "====="])
+        self.chat_history = prompt + response.strip() + "\n"
+        self.log(response + "\n")

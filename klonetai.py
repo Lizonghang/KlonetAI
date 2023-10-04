@@ -1,4 +1,5 @@
 import requests
+import klonet_api
 from klonet_api import *
 
 
@@ -7,7 +8,7 @@ def error_handler(func):
         try:
             return func(*args, **kwargs)
         except Exception as msg:
-            print(f"[Error] {msg}")
+            print(f"{msg}")
 
     return wrapper
 
@@ -39,8 +40,10 @@ class KlonetAI:
         self._node_manager = None
         self._link_manager = None
         self._cmd_manager = None
+        self._logged_in = False
         self._topo = Topo()
         self._link_config = {}
+        self.additional_info = {}
 
     @property
     def project_name(self):
@@ -57,6 +60,19 @@ class KlonetAI:
     @property
     def port(self):
         return self._port
+
+    @property
+    def is_logged_in(self):
+        return self._logged_in
+
+    @property
+    def is_topo_deployed(self):
+        response = self.remote_topo
+        return False if type(response) is str else True
+
+    @property
+    def is_agent_initialized(self):
+        return self._agent is not None
 
     @property
     def images(self):
@@ -124,28 +140,39 @@ class KlonetAI:
         self._port = port
         self._image_manager = ImageManager(self._user, self._backend_host, self._port)
         self._project_manager = ProjectManager(self._user, self._backend_host, self._port)
-        self._node_manager = NodeManager(self._user, project, self._backend_host, self._port)
-        self._link_manager = LinkManager(self._user, project, self._backend_host, self._port)
-        self._cmd_manager = CmdManager(self._user, project, self._backend_host, self._port)
+        self._node_manager = NodeManager(self._user, self._project, self._backend_host, self._port)
+        self._link_manager = LinkManager(self._user, self._project, self._backend_host, self._port)
+        self._cmd_manager = CmdManager(self._user, self._project, self._backend_host, self._port)
+        self._logged_in = True
 
-    def create_agent(self, agent=None, agent_name="", tools=[],
-                     openai_model="gpt-3.5-turbo-16k", keep_tools=False):
+    def test_klonet_connection(self):
+        try:
+            _ = self.images
+            return True
+        except (klonet_api.common.errors.HttpStatusError,
+                requests.exceptions.ConnectionError, AttributeError):
+            return False
+
+    def create_agent(self, agent=None, agent_name="", key="", tools=[],
+                     openai_model="gpt-3.5-turbo-16k", keep_tools=False,
+                     chat_prompt_template="LIKirin/klonetai-prompts",
+                     run_prompt_template="LIKirin/klonetai-prompts"):
         if agent:
             self._agent = agent
             print(f"Connected to Agent {agent.model_name}.")
         elif agent_name == "openai":
-            from transformers.tools import OpenAiAgent
+            from agent.openai import KAIOpenAIAgent
             from key import OpenAI_API_Key
-            self._agent = OpenAiAgent(
+            self._agent = KAIOpenAIAgent(
                 model=openai_model,
-                api_key=OpenAI_API_Key,
-                chat_prompt_template="LIKirin/klonetai-prompts",
-                run_prompt_template="LIKirin/klonetai-prompts",
+                api_key=key or OpenAI_API_Key,
+                chat_prompt_template=chat_prompt_template,
+                run_prompt_template=run_prompt_template,
                 additional_tools=tools
             )
             print("Connected to OpenAI Agent.")
         else:
-            from transformers.tools import HfAgent
+            from agent.huggingface import KAIHfAgent
             from key import Huggingface_API_Key
             pinned_model = {
                 "starcoder": "bigcode/starcoder",
@@ -155,11 +182,11 @@ class KlonetAI:
             }
             model_suffix = pinned_model.get(agent_name, "bigcode/starcoder")
             url = f"https://api-inference.huggingface.co/models/{model_suffix}"
-            self._agent = HfAgent(
+            self._agent = KAIHfAgent(
                 url,
-                token=Huggingface_API_Key,
-                chat_prompt_template="LIKirin/klonetai-prompts",
-                run_prompt_template="LIKirin/klonetai-prompts",
+                token=key or Huggingface_API_Key,
+                chat_prompt_template=chat_prompt_template,
+                run_prompt_template=run_prompt_template,
                 additional_tools=tools
             )
             print(f"Connected to 🤗 Agent: {model_suffix}.")
@@ -207,6 +234,13 @@ class KlonetAI:
     @error_handler
     def run(self, *args, **kwargs):
         return self._agent.run(*args, **kwargs)
+
+    @property
+    def mode(self):
+        return self._agent.mode
+
+    def set_mode(self, mode):
+        self._agent.set_mode(mode)
 
     def reset_project(self):
         self._topo = Topo()
@@ -304,19 +338,21 @@ class KlonetAI:
             return data_json["stat"]
         return http_response_handler(response, get_deploy_status)
 
-    def execute(self, node_name, command):
+    def execute(self, node_name, command, block="false", timeout=60):
         response = self._cmd_manager.exec_cmds_in_nodes({
             node_name: [command]
-        })
+        }, block, timeout)
         return response
 
-    def batch_exec(self, ctns, command):
+    def batch_exec(self, ctns, command, block="false", timeout=60):
         url = f"http://{self._backend_host}:{self._port}/master/batch_exec_cmd/"
         data = {
             "user": self._user,
             "topo": self._project,
             "ctns": ctns,
-            "cmd": command
+            "cmd": command,
+            "block": block,
+            "cmd_timeout_s": timeout
         }
         response = requests.post(url, json=data)
 
@@ -379,7 +415,7 @@ class KlonetAI:
             return data_json["status"]
         return http_response_handler(response, get_status)
 
-    def upload_file(self, node_name, src_filepath, tgt_filepath="/home"):
+    def upload_file(self, node_name, src_file, tgt_filepath="/home"):
         url = f"http://{self._backend_host}:{self._port}/file/uload/"
         data = {
             "user": self._user,
@@ -387,7 +423,7 @@ class KlonetAI:
             "ne_name": node_name,
             "file_path": tgt_filepath,
         }
-        files = {"file": open(src_filepath, "rb")}
+        files = {"file": open(src_file, "rb") if type(src_file) is str else src_file}
         response = requests.post(url, data=data, files=files)
         return http_response_handler(response)
 

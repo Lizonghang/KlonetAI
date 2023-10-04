@@ -163,3 +163,4 @@ klonet_webui/
 demo.py
 *.ipynb
 key.py
+output/

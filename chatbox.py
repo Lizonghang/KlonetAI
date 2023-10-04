@@ -24,10 +24,10 @@ os.makedirs(save_dir, exist_ok=True)
 pn.extension("floatpanel", notifications=True)
 
 # Login to Klonet backend.
-project_name_input = pn.widgets.TextInput(name="Project:", placeholder="", value="")
-user_name_input = pn.widgets.TextInput(name="User:", placeholder="", value="")
-host_ip_input = pn.widgets.TextInput(name="Klonet Backend Host IP:", placeholder="", value="")
-port_input = pn.widgets.TextInput(name="Klonet Backend Port:", placeholder="", value="")
+project_name_input = pn.widgets.TextInput(name="Project:", value="")
+user_name_input = pn.widgets.TextInput(name="User:", value="")
+host_ip_input = pn.widgets.PasswordInput(name="Klonet Backend Host IP:", value="")
+port_input = pn.widgets.PasswordInput(name="Klonet Backend Port:", value="")
 
 
 def click_login_klonet_button(event):
@@ -123,11 +123,11 @@ select_model_button = pn.widgets.Select(name="Model Name:")
 select_organization_button.param.watch(update_model_options, "value")
 select_organization_button.options = organizations
 
-APIKey_input = pn.widgets.TextInput(
+APIKey_input = pn.widgets.PasswordInput(
     name="API Key:", placeholder="Default to use the APIKey in key.py", value="")
-APPID_input = pn.widgets.TextInput(
+APPID_input = pn.widgets.PasswordInput(
     name="APP ID (optional):", placeholder="Default to use the APPID in key.py", value="")
-APPSecret_input = pn.widgets.TextInput(
+APPSecret_input = pn.widgets.PasswordInput(
     name="APP Secret (optional):", placeholder="Default to use the APPSecret in key.py", value="")
 run_mode_switch = pn.widgets.Switch(name="Chat-only", value=False)
 

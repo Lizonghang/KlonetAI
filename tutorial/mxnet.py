@@ -24,15 +24,15 @@ class MXNETTutorial(Tool):
     Below is an example to start 1 scheduler, 1 server, and 2 workers locally:
     # Start a scheduler.
     DMLC_ROLE=scheduler DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=9092 
-    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python demo.py --kvstore dist_sync
+    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python main.py
 
     # Start a server.
     DMLC_ROLE=server DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=9092 
-    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python demo.py --kvstore dist_sync
+    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python main.py
     
     # For two workers, run the following command for each of them.
     DMLC_ROLE=worker DMLC_PS_ROOT_URI=127.0.0.1 DMLC_PS_ROOT_PORT=9092 
-    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python demo.py --kvstore dist_sync
+    DMLC_NUM_SERVER=1 DMLC_NUM_WORKER=2 python main.py
     
     Args:
         None

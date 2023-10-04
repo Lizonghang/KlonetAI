@@ -337,8 +337,18 @@ class KlonetCommandExecTool(Tool):
 
     @error_handler
     def __call__(self, node_name: str, command: str):
-        response = kai.execute(node_name, command)
-        print(response[node_name][command]['output'].strip())
+        full_command = "source ~/.bashrc"
+        conda_path = kai.additional_info.get("conda_path", "")
+        conda_env = kai.additional_info.get("conda_env", "")
+        if conda_path and conda_env:
+            full_command = " && ".join([
+                full_command,
+                f"source {conda_path}",
+                f"conda activate {conda_env}"]
+            )
+        full_command = " && ".join([full_command, command])
+        response = kai.execute(node_name, f'bash -c "{full_command}"')
+        print(list(response[node_name].values())[0]['output'].strip())
 
 
 class KlonetBatchCommandExecTool(Tool):
@@ -381,7 +391,18 @@ class KlonetBatchCommandExecTool(Tool):
     @error_handler
     def __call__(self, node_list: list, node_type: str, command: str):
         ctns = {"list_type": node_type, "list": node_list}
-        result = kai.batch_exec(ctns, command)
+
+        full_command = "source ~/.bashrc"
+        conda_path = kai.additional_info.get("conda_path", "")
+        conda_env = kai.additional_info.get("conda_env", "")
+        if conda_path and conda_env:
+            full_command = " && ".join([
+                full_command,
+                f"source {conda_path}",
+                f"conda activate {conda_env}"]
+            )
+        full_command = " && ".join([full_command, command])
+        result = kai.batch_exec(ctns, f'bash -c "{full_command}"')
         print(result)
 
 

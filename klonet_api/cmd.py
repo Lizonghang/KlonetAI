@@ -15,7 +15,7 @@ class CmdManager(Manager):
         self.user = user_name
         self.project = project_name
 
-    def exec_cmds_in_nodes(self, node2cmds):
+    def exec_cmds_in_nodes(self, node2cmds, block="false", timeout=60):
         """在多个节点中执行多条shell命令
 
         需注意，若执行较长时间阻塞的命令，如iperf3 -s，后台会执行此命令，
@@ -35,7 +35,9 @@ class CmdManager(Manager):
         payload = {
             "user": self.user,
             "topo": self.project,
-            "node_and_cmd": node2cmds
+            "node_and_cmd": node2cmds,
+            "block": block,
+            "cmd_timeout_s": timeout
         }
         resp = self._post("/master/node_exec_cmd/", json=payload)
         resp_json = self._parse_resp(resp)

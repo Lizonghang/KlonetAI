@@ -10,7 +10,6 @@ from panel.widgets import SpeechToText
 from contextlib import redirect_stdout
 from tool.klonet import kai
 
-# Total: 5887 tokens
 tools = [obj() for obj in tool.base]        # 119 tokens
 tools += [obj() for obj in tool.klonet]     # 4922 tokens
 tools += [obj() for obj in tool.topo]       # 541 tokens
@@ -25,14 +24,10 @@ os.makedirs(save_dir, exist_ok=True)
 pn.extension("floatpanel", notifications=True)
 
 # Login to Klonet backend.
-project_name_input = pn.widgets.TextInput(
-    name="Project:", placeholder="klonetai", value="klonetai")
-user_name_input = pn.widgets.TextInput(
-    name="User:", placeholder="wudx", value="wudx")
-host_ip_input = pn.widgets.TextInput(
-    name="Klonet Backend Host IP:", placeholder="kb310server.f3322.net", value="kb310server.f3322.net")
-port_input = pn.widgets.TextInput(
-    name="Klonet Backend Port:", placeholder="12313", value="12313")
+project_name_input = pn.widgets.TextInput(name="Project:", placeholder="", value="")
+user_name_input = pn.widgets.TextInput(name="User:", placeholder="", value="")
+host_ip_input = pn.widgets.TextInput(name="Klonet Backend Host IP:", placeholder="", value="")
+port_input = pn.widgets.TextInput(name="Klonet Backend Port:", placeholder="", value="")
 
 
 def click_login_klonet_button(event):

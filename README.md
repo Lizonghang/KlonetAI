@@ -3,9 +3,9 @@
   <img src="icon.png" alt="Icon" width="500">
 </p>
 
-This repo provides an AI agent for intelligent interaction with the 
-Klonet platform. Some examples are provided to show what this repo 
-is used for, as below.
+Klonet is designed to support the development and testing of new network protocols and applications in a realistic environment, such as distributed artificial intelligence and federated learning.  Klonet can emulate various network scenarios, such as wireless, mobile, satellite, and optical networks, and provide fine-grained control over the network parameters, such as bandwidth, delay, jitter, and packet loss. Klonet can also integrate with real devices and applications, such as routers, switches, sensors, and smartphones, to create hybrid network experiments.
+
+KlonetAI provides an AI agent for intelligent interaction with the Klonet platform. Here we give some examples to show the magic of KlonetAI.
 
 **NOTE: You may need a VPN service to access 🤗.**
 

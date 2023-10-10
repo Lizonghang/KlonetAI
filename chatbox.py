@@ -187,7 +187,7 @@ def click_login_agent_button(event):
     if run_mode_switch.value:
         kai.set_mode("chat")
         chat_box.append(
-            {AGENT_NAME: "Chat-only mode is turned on, this chat can only be used forgeneral conversations."})
+            {AGENT_NAME: "Chat-only mode is turned on, this chat can only be used for general conversations."})
 
     login_agent_button.button_type = "success"
     login_agent_button.name = "Try Another Agent"

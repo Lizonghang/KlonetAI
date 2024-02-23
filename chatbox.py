@@ -540,7 +540,7 @@ def click_clear_command_button(event):
 command_input = pn.widgets.TextAreaInput(name="Command:", value="", width=320, height=70)
 run_command_button = pn.widgets.Button(name="Run", button_type="primary", width=150)
 run_command_button.on_click(click_run_command_button)
-clear_command_button = pn.widgets.Button(name="Clear Command", button="default", width=150)
+clear_command_button = pn.widgets.Button(name="Clear Command", button_type="default", width=150)
 clear_command_button.on_click(click_clear_command_button)
 node_group_checkbox_text_for_command = pn.widgets.StaticText(
     value="Which types of nodes to run these commands?")

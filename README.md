@@ -5,7 +5,7 @@
 
 Klonet is designed to support the development and testing of new network protocols and applications in a realistic environment, such as distributed artificial intelligence and federated learning.  Klonet can emulate various network scenarios, such as wireless, mobile, satellite, and optical networks, and provide fine-grained control over the network parameters, such as bandwidth, delay, jitter, and packet loss. Klonet can also integrate with real devices and applications, such as routers, switches, sensors, and smartphones, to create hybrid network experiments.
 
-To appear on NSDI '24:
+Accepted by NSDI '24:
 
 > Tie Ma, Long Luo, **Hongfang Yu**, et al., "Klonet: An Easy-to-Use and Scalable Platform for Computer Networks Education." In 21st USENIX Symposium on Networked Systems Design and Implementation (NSDI '24), Santa Clara, CA, USA, 2024.
 

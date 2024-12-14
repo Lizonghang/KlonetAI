@@ -815,5 +815,3 @@ Feedback from h5 after calling DMLC_ROLE=worker DMLC_PS_ROOT_URI=192.168.1.22 DM
 Calling Klonet Exec Command API ...
 Feedback from h6 after calling DMLC_ROLE=worker DMLC_PS_ROOT_URI=192.168.1.22 DMLC_PS_ROOT_PORT=9092 DMLC_NUM_SERVER=2 DMLC_NUM_WORKER=3 python example/gluon/image_classification.py --dataset cifar10 --model vgg11 --epochs 1 --kvstore dist_sync.
 ```
-
-This tool is currently under development. Please stay tuned for updates!
